@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import 'react-toastify/dist/ReactToastify.css';
+.leaflet-touch .leaflet-control-layers, .leaflet-touch .leaflet-bar{
+    border: none !important;
+}
+.leaflet-control-zoom-in{
+   border-radius: 50% !important;
+   width: 40px !important;
+   height: 40px !important;
+   display: flex !important;
+   align-items: center !important;
+   justify-content: center !important;
+   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px !important;
+   margin-top: 10px !important;
+   margin-bottom: 10px !important;
+}
+.leaflet-control-zoom-out{
+    border-radius: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px !important;
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+}
+
+.ant-checkbox-checked .ant-checkbox-inner {
+    background-color: #009579 !important;
+    border-color: #009579 !important;
+  }
+
+.ant-btn-primary {
+    background-color: red;
+}

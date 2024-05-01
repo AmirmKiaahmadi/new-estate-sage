@@ -1,0 +1,235 @@
+@import '../../styles/colors';
+
+.floating-label-input {
+    position: relative;
+    width: 100%;
+
+    small {
+        font-size: 0.7em;
+        color: map-get($map: $colors, $key: red-2);
+    }
+
+    .input-icon {
+        position: absolute;
+        top: 14px;
+        left: 9px;
+        font-size: 1.2em;
+
+        &.invalid {
+            color: map-get($map: $colors, $key: danger-secondary);
+        }
+
+        &.valid {
+            color: map-get($map: $colors, $key: primary);
+        }
+    }
+    
+}
+.floating-label-input-gray {
+    position: relative;
+    width: 100%;
+
+    small {
+        font-size: 0.7em;
+        color: map-get($map: $colors, $key: red-2);
+    }
+
+    .input-icon {
+        position: absolute;
+        top: 14px;
+        left: 9px;
+        font-size: 1.2em;
+
+        &.invalid {
+            color: map-get($map: $colors, $key: danger-secondary);
+        }
+
+        &.valid {
+            color: map-get($map: $colors, $key: primary);
+        }
+    }
+}
+
+// iban
+.floating-label-input-iban {
+    position: relative;
+    width: 100%;
+
+    small {
+        font-size: 0.7em;
+        color: map-get($map: $colors, $key: red-2);
+    }
+
+    .input-icon {
+        position: absolute;
+        top: 14px;
+        left: 9px;
+        font-size: 1.2em;
+
+        &.invalid {
+            color: map-get($map: $colors, $key: danger-secondary);
+        }
+
+        &.valid {
+            color: map-get($map: $colors, $key: primary);
+        }
+    }
+}
+
+.floating-label-input input {
+    width: 100%;
+    height: 50px;
+    position: relative;
+    background: transparent;
+    outline: none;
+    vertical-align: middle;
+    font-size: 14px;
+    font-weight: bold;
+    border: 1px solid map-get($map: $colors, $key: primary);
+    border-radius: 15px;
+    padding: 0 10px;
+    color: map-get($map: $colors, $key: gray-1);
+
+    &.invalid {
+        border: 1px solid map-get($map: $colors, $key: red-1);
+    }
+
+    &.valid {
+        border: 1px solid map-get($map: $colors, $key: primary);
+
+        i {
+            color: map-get($map: $colors, $key: primary);
+        }
+    }
+}
+.floating-label-input-gray input {
+    width: 100%;
+    height: 50px;
+    position: relative;
+    background: transparent;
+    outline: none;
+    vertical-align: middle;
+    font-size: 14px;
+    font-weight: bold;
+    border: 1px solid map-get($map: $colors, $key: '#B7BEC7');
+    border-radius: 15px;
+    padding: 0 10px;
+    color: map-get($map: $colors, $key: gray-1);
+    text-align: center;
+
+    &.invalid {
+        border: 1px solid map-get($map: $colors, $key: red-1);
+    }
+
+    &.valid {
+        border: 1px solid map-get($map: $colors, $key: primary);
+
+        i {
+            color: map-get($map: $colors, $key: primary);
+        }
+    }
+}
+//iban
+
+.floating-label-input-iban input {
+    width: 100%;
+    height: 50px;
+    position: relative;
+    background: transparent;
+    outline: none;
+    vertical-align: middle;
+    font-size: 18px;
+    font-weight: bold;
+    border: 1px solid map-get($map: $colors, $key: primary);
+    border-radius: 15px;
+    padding: 0 50px;
+    color: map-get($map: $colors, $key: gray-1);
+
+    &.invalid {
+        border: 1px solid map-get($map: $colors, $key: red-1);
+    }
+
+    &.valid {
+        border: 1px solid map-get($map: $colors, $key: primary);
+
+        i {
+            color: map-get($map: $colors, $key: primary);
+        }
+    }
+}
+
+.floating-label-input input:disabled {
+    background-color: map-get($map: $colors, $key: gray-6);
+}
+.floating-label-input-gray input:disabled {
+    background-color: map-get($map: $colors, $key: gray-6);
+}
+//iban
+
+.floating-label-input-iban input:disabled {
+    background-color: map-get($map: $colors, $key: gray-6);
+}
+
+.floating-label-input .secondary-title {
+    position: absolute;
+    left: 5%;
+    top: 12px;
+    color: map-get($map: $colors, $key: black);
+    // z-index: -1;
+}
+
+.floating-label-input-gray .secondary-title {
+    position: absolute;
+    left: 5%;
+    top: 12px;
+    color: map-get($map: $colors, $key: black);
+    // z-index: -1;
+}
+//iban
+
+.floating-label-input-iban .secondary-title {
+    position: absolute;
+    left: 5%;
+    top: 12px;
+    color: map-get($map: $colors, $key: black);
+    // z-index: -1;
+}
+.floating-label-input-iban .iban {
+    position: absolute;
+    left: 5%;
+    top: 15px;
+    color: map-get($map: $colors, $key: black);
+    z-index: -1;
+    font-size: 18px;
+}
+.floating-label-input label {
+    position: absolute;
+    top: -10px;
+    font-size: 15px;
+    left: 18px;
+    transition: all 0.2s;
+    padding: 0 5px;
+   
+    
+}
+.floating-label-input-gray label {
+    position: absolute;
+    top: -10px;
+    font-size: 15px;
+    right: 18px;
+    // color: map-get($map: $colors, $key: primary);
+    transition: all 0.2s;
+    padding: 0 5px;
+}
+
+//iban
+
+.floating-label-input-iban label {
+    position: absolute;
+    top: -10px;
+    font-size: 15px;
+    right: 18px;
+    // color: map-get($map: $colors, $key: primary);
+    transition: all 0.2s;
+    padding: 0 5px;
+}
