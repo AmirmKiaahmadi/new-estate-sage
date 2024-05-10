@@ -1,71 +1,17 @@
 import { Modal, Radio, RadioChangeEvent, Space } from 'antd'
-import React, { useState } from 'react'
-
-const defaultRadioList: { label: string; value: number }[] = [
-    {
-        label: 'Last 1 Days',
-        value: 1,
-    },
-    {
-        label: 'Last 3 Days',
-        value: 3,
-    },
-    {
-        label: 'Last 7 Days',
-        value: 7,
-    },
-    {
-        label: 'Last 30 Days',
-        value: 30,
-    },
-    {
-        label: 'Last 90 Days',
-        value: 90,
-    },
-    {
-        label: 'Last 180 Days',
-        value: 180,
-    },
-    {
-        label: 'Last 360 Days',
-        value: 360,
-    },
-    {
-        label: 'Year 2024',
-        value: 2024,
-    },
-    {
-        label: 'Year 2023',
-        value: 2023,
-    },
-    {
-        label: 'Year 2022',
-        value: 2022,
-    },
-    {
-        label: 'Year 2021',
-        value: 2021,
-    },
-    {
-        label: 'Year 2020',
-        value: 2020,
-    },
-    {
-        label: 'Year 2019',
-        value: 2019,
-    },
-    {
-        label: 'Year 2018',
-        value: 2018,
-    },
-]
-
-export default function SoldModal({ open, onHide }: IGenericModal) {
-    const [selectedRadio, setSelectedRadio] = useState<number>(0)
-    const [radioList, setRadioList] =
-        useState<{ label: string; value: number }[]>(defaultRadioList)
+import { defaultSoldList } from 'layout/main/header/utils'
+interface ISoldModalProps extends IGenericModal {
+    selectedSold: number
+    setSelectedSold: React.Dispatch<React.SetStateAction<number>>
+}
+export default function SoldModal({
+    open,
+    onHide,
+    selectedSold,
+    setSelectedSold,
+}: ISoldModalProps) {
     const onChange = (e: RadioChangeEvent) => {
-        setSelectedRadio(e.target.value)
+        setSelectedSold(e.target.value)
     }
     return (
         <Modal
@@ -78,9 +24,9 @@ export default function SoldModal({ open, onHide }: IGenericModal) {
             footer=""
             width={300}
         >
-            <Radio.Group value={selectedRadio} onChange={onChange}>
+            <Radio.Group value={selectedSold} onChange={onChange}>
                 <Space direction="vertical">
-                    {radioList.map((item, index) => (
+                    {defaultSoldList.map((item, index) => (
                         <Radio value={item.value} key={index}>
                             {item.label}
                         </Radio>

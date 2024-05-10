@@ -3,22 +3,27 @@ import { useState } from 'react'
 import { Checkbox } from 'antd'
 import { CheckboxChangeEvent } from 'antd/es/checkbox'
 
-const defaultCheckedList: Array<{ label: string; checked: boolean }> = [
-    { label: 'Detached', checked: false },
-    { label: 'Semi-Detached', checked: false },
-    { label: 'Freehold-Townhouse', checked: false },
-    { label: 'Condo Townhouse', checked: false },
-    { label: 'Condo Apt', checked: false },
-    { label: 'Link', checked: false },
-    { label: 'Multiplex', checked: false },
-    { label: 'Vacant Land', checked: false },
-    { label: 'Other', checked: false },
-]
+interface IProperyModalProps extends IGenericModal {
+    checkedList: {
+        label: string
+        checked: boolean
+    }[]
+    setCheckedList: React.Dispatch<
+        React.SetStateAction<
+            {
+                label: string
+                checked: boolean
+            }[]
+        >
+    >
+}
 
-export default function PropertyModal({ open, onHide }: IGenericModal) {
-    const [checkedList, setCheckedList] =
-        useState<Array<{ label: string; checked: boolean }>>(defaultCheckedList)
-
+export default function PropertyModal({
+    open,
+    onHide,
+    checkedList,
+    setCheckedList,
+}: IProperyModalProps) {
     const handleOnChange = (name: string | undefined) => {
         const newCheckedList: Array<{ label: string; checked: boolean }> = []
         checkedList.map((item) =>

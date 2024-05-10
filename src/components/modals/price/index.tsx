@@ -43,6 +43,15 @@ export default function PriceModal({
                     defaultValue={[20, 100]}
                     max={6000000}
                     onChange={setPrice}
+                    styles={{
+                        track: {
+                            background: 'transparent',
+                        },
+                        tracks: {
+                            background: `#009579`,
+                        },
+                        handle: { background: '#009579' },
+                    }}
                 />
                 <div className=" flex justify-between">
                     <button

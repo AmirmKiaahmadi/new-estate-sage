@@ -1,8 +1,8 @@
 const popupContent: { [key: string]: string } = {
     textAlign: 'center',
-    height: '200px',
     marginTop: '30px',
     display: 'flex',
+    width: '1000px',
 }
 const popupHead: { [key: string]: string } = {
     fontWeight: 'bold',

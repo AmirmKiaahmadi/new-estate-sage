@@ -12,8 +12,15 @@ export default function Login() {
             validationSchema={Schema}
             initialValues={{ email: '', password: '' }}
             onSubmit={async (values) => {
-                toast.success('Login Successfully')
-                navigate('/map')
+                if (
+                    values.email === 'amirmkiaahmadi@gmail.com' &&
+                    values.password === '123456'
+                ) {
+                    toast.success('Login Successfully')
+                    navigate('/map')
+                } else {
+                    toast.error('email or password is incurrect')
+                }
             }}
         >
             <Form className=" flex justify-center items-center m-auto w-screen  ">

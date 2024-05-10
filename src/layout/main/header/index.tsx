@@ -4,7 +4,7 @@ import Logo from 'assets/images/logo/logo.jpg'
 import InputSearch from 'components/inputSearch'
 import { useState } from 'react'
 import { AiOutlineSearch } from 'react-icons/ai'
-import { items } from './utils'
+import { defaultActiveList, defaultCheckedList, items } from './utils'
 import PropertyModal from 'components/modals/propertyModal'
 import PriceModal from 'components/modals/price'
 import ActiveModal from 'components/modals/activeModal'
@@ -20,6 +20,11 @@ export default function Header() {
     const [isActive, setActive] = useState<boolean>(false)
     const [isSold, setIsSold] = useState<boolean>(false)
     const [isDeListed, setIsDelisted] = useState<boolean>(false)
+    const [checkedList, setCheckedList] =
+        useState<Array<{ label: string; checked: boolean }>>(defaultCheckedList)
+
+    const [selectedActive, setSelectedActive] = useState<number>(0)
+    const [selectedSold, setSelectedSold] = useState<number>(0)
 
     const handleForSaleClick: MenuProps['onClick'] = (e) => {
         setForSale(e.key)
@@ -28,8 +33,15 @@ export default function Header() {
         items,
         onClick: handleForSaleClick,
     }
+    const handleClearAllStates = () => {
+        setForSale('For Sale')
+        setPrice([20, 100])
+        setCheckedList(defaultCheckedList)
+        setSelectedActive(0)
+        setSelectedSold(0)
+    }
     return (
-        <div>
+        <div className=" relative">
             <div className=" flex justify-between py-1 items-center">
                 <div className=" flex items-center mx-2 w-full">
                     <img
@@ -38,7 +50,7 @@ export default function Header() {
                         className=" w-10 h-10 rounded-full"
                     />
                     <h1 className=" text-white font-extrabold text-2xl mx-2">
-                        StateSage
+                        estateSage
                     </h1>
                     <InputSearch
                         name="search"
@@ -48,7 +60,7 @@ export default function Header() {
                         placeholder="Search AI"
                     />
                 </div>
-                <div className=" w-full">
+                <div className=" w-full relative">
                     <div className=" flex items-center w-full  justify-end">
                         <div className=" flex justify-start text-white">
                             <p className=" mx-4 cursor-pointer border-b-2 hover:border-white border-primary pb-1">
@@ -70,7 +82,7 @@ export default function Header() {
                     </div>
                 </div>
             </div>
-            <div className=" bg-white w-full py-1 flex justify-center">
+            <div className=" bg-white w-full py-1 flex justify-center relative">
                 <ConfigProvider
                     theme={{
                         token: {
@@ -126,13 +138,18 @@ export default function Header() {
                 >
                     Sold
                 </div>
-                <div className=" py-2 rounded-xl px-4 border border-[#00b96b] text-[#00b96b] cursor-pointer mx-2 ">
+                <div
+                    className=" py-2 rounded-xl px-4 border border-[#00b96b] text-[#00b96b] cursor-pointer mx-2 "
+                    onClick={handleClearAllStates}
+                >
                     Clear All
                 </div>
             </div>
             <PropertyModal
                 open={isOpenPropertyModal}
                 onHide={() => setIsOpenPropertyModal(false)}
+                checkedList={checkedList}
+                setCheckedList={setCheckedList}
             />
             <PriceModal
                 open={isOpenPriceModal}
@@ -140,8 +157,19 @@ export default function Header() {
                 price={price}
                 setPrice={setPrice}
             />
-            <ActiveModal open={isActive} onHide={() => setActive(false)} />
-            <SoldModal open={isSold} onHide={() => setIsSold(false)} />
+            <ActiveModal
+                open={isActive}
+                onHide={() => setActive(false)}
+                radioList={defaultActiveList}
+                setSelectedRadio={setSelectedActive}
+                selectedRadio={selectedActive}
+            />
+            <SoldModal
+                open={isSold}
+                onHide={() => setIsSold(false)}
+                selectedSold={selectedSold}
+                setSelectedSold={setSelectedSold}
+            />
             <DeListedModal
                 open={isDeListed}
                 onHide={() => setIsDelisted(false)}

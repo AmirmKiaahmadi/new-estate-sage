@@ -1,49 +1,22 @@
 import { Modal, Radio, RadioChangeEvent, Space } from 'antd'
 import React, { useState } from 'react'
 
-const defaultRadioList: { label: string; value: number }[] = [
-    {
-        label: 'Last 1 Days',
-        value: 1,
-    },
-    {
-        label: 'Last 3 Days',
-        value: 3,
-    },
-    {
-        label: 'Last 7 Days',
-        value: 7,
-    },
-    {
-        label: 'Last 30 Days',
-        value: 30,
-    },
-    {
-        label: 'Last 90 Days',
-        value: 90,
-    },
-    {
-        label: 'More than 15 days',
-        value: 150,
-    },
-    {
-        label: 'More than 30 days',
-        value: 300,
-    },
-    {
-        label: 'More than 60 days',
-        value: 600,
-    },
-    {
-        label: 'More than 90 days',
-        value: 900,
-    },
-]
+interface IActiveModalProps extends IGenericModal {
+    radioList: {
+        label: string
+        value: number
+    }[]
+    setSelectedRadio: React.Dispatch<React.SetStateAction<number>>
+    selectedRadio: number
+}
 
-export default function ActiveModal({ open, onHide }: IGenericModal) {
-    const [selectedRadio, setSelectedRadio] = useState<number>(0)
-    const [radioList, setRadioList] =
-        useState<{ label: string; value: number }[]>(defaultRadioList)
+export default function ActiveModal({
+    open,
+    onHide,
+    radioList,
+    setSelectedRadio,
+    selectedRadio,
+}: IActiveModalProps) {
     const onChange = (e: RadioChangeEvent) => {
         setSelectedRadio(e.target.value)
     }

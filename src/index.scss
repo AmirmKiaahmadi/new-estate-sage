@@ -36,3 +36,15 @@
 .ant-btn-primary {
     background-color: red;
 }
+
+.leaflet-popup-content-wrapper{
+    background-color: transparent !important;
+    box-shadow:  none !important;
+}
+
+.leaflet-container a.leaflet-popup-close-button{
+    visibility:  hidden !important;
+}
+.leaflet-popup-content p{
+    margin: 5px 0 !important;
+}
