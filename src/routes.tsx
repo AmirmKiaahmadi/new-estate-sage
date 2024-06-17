@@ -1,4 +1,5 @@
 import { authRoutes } from 'pages/auth/routes'
+import { signupRoutes } from 'pages/auth/signup/routes'
 import { mapRoutes } from 'pages/map/routes'
 import NotFound from 'pages/notFound'
 import { Navigate, createBrowserRouter } from 'react-router-dom'
@@ -8,4 +9,5 @@ export const routes = createBrowserRouter([
     { path: '*', element: <NotFound /> },
     ...authRoutes,
     ...mapRoutes,
+    ...signupRoutes,
 ])

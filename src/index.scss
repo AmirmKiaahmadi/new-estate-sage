@@ -48,3 +48,25 @@
 .leaflet-popup-content p{
     margin: 5px 0 !important;
 }
+
+.rce-container-mbox{
+    min-width: 0 !important;
+}
+
+.leaflet-draw-draw-polygon{
+    border-radius: 50% !important;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px !important;  
+}
+
+.leaflet-draw-edit-edit{
+    border-radius: 50% !important;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px !important;  
+    margin-bottom: 10px;
+    cursor: pointer  !important;
+}
+
+.leaflet-draw-edit-remove{
+    border-radius: 50% !important;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px !important;  
+    cursor: pointer  !important;
+}

@@ -1,5 +1,6 @@
 import MarkerClusterGroup from 'react-leaflet-cluster'
 import {
+    FeatureGroup,
     MapContainer,
     Marker,
     Popup,
@@ -20,16 +21,35 @@ import { MdBedroomParent } from 'react-icons/md'
 import { FaLocationDot } from 'react-icons/fa6'
 import Control from 'react-leaflet-custom-control'
 import { MdLightMode } from 'react-icons/md'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { MdDarkMode } from 'react-icons/md'
 import classNames from 'classnames'
 import { IoMdCloseCircle } from 'react-icons/io'
 import DetailModal from './modal'
+import Filters from './filters'
+import {
+    Bathtub,
+    Bed,
+    BookmarkSimple,
+    Car,
+    MapPin,
+    ShareNetwork,
+    Stack,
+    StackSimple,
+} from '@phosphor-icons/react'
+import HouseExample from 'assets/images/map/house.png'
+import AiChatFilters from './aiChatFilters'
+import { EditControl } from 'react-leaflet-draw'
+import 'leaflet-draw/dist/leaflet.draw.css'
+import useGetAiService from './hooks/useGetAiServicde'
 const Map = () => {
     const [isVisible, setIsVisible] = useState<boolean>(false)
-    const [isOpenSidebar, setIsOpenSidebar] = useState<boolean>(false)
+    const [isOpenSidebar, setIsOpenSidebar] = useState<boolean>(true)
     const [openDetail, setOpenDetail] = useState<boolean>(false)
-    const [childrens, setChildrens] = useState<
+    const [childrens, setChildrens] = useState<Array<any> | undefined>(
+        undefined
+    )
+    const [openChatAi, setOpenChatAi] = useState<
         Array<[number, number, string]> | undefined
     >(undefined)
     const navigate = useNavigate()
@@ -39,6 +59,13 @@ const Map = () => {
         iconAnchor: [22, 94],
         popupAnchor: [-3, -76],
     })
+    const query = 'show me apartment with 2 room'
+    const { mutate } = useGetAiService()
+
+    useEffect(() => {
+        mutate(query)
+    }, [])
+
     return (
         <>
             <div
@@ -47,59 +74,16 @@ const Map = () => {
                     isOpenSidebar ? 'flex overflow-hidden' : ''
                 )}
             >
-                <div
-                    onClick={() => setIsOpenSidebar(false)}
-                    className=" absolute bg-white rounded-xl shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] p-4 left-2 top-2 z-10 cursor-pointer"
-                >
-                    <IoMdCloseCircle />
-                </div>
                 {isOpenSidebar && (
-                    <div
-                        className=" h-full w-[30%] overflow-y-scroll p-4 relative z-0 "
-                        onClick={() => setOpenDetail(true)}
-                    >
-                        <>
-                            {childrens &&
-                                childrens.map((item) => (
-                                    <div className="grid grid-cols-3 gap-4 my-3 rounded-lg border border-[#a4aab0] p-2 h-[100px] shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] cursor-pointer hover:shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] ">
-                                        <div className=" relative">
-                                            <img
-                                                src={House}
-                                                alt="house"
-                                                className=" rounded-lg h-full w-full"
-                                            />
-                                            <span className=" absolute bottom-2 left-2 bg-white rounded-full py-0.5 px-1 text-primary text-xs text-center">
-                                                For Sale
-                                            </span>
-                                        </div>
-                                        <div className=" col-span-2">
-                                            <p className="">
-                                                Listed :{' '}
-                                                <span className=" text-primary">
-                                                    ${' '}
-                                                    {Number(
-                                                        579000
-                                                    ).toLocaleString()}
-                                                </span>
-                                            </p>
-                                            <p>Detached</p>
-                                            <div className="flex items-center mt-2">
-                                                <FaLocationDot
-                                                    color="#009579"
-                                                    size={15}
-                                                />
-
-                                                <span className=" text-xs mx-1 ">
-                                                    Toronto - Church-Yonge
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                        </>
+                    <div className=" h-full w-[20%]  p-4 relative shadow-[21px 7px 35px -3px rgba(0,0,0,0.48)] ">
+                        <Filters setOpenChatAi={setOpenChatAi} />
                     </div>
                 )}
-
+                {openChatAi && (
+                    <div className=" h-full w-[25%]  p-2 relative shadow-[21px 7px 35px -3px rgba(0,0,0,0.48)] border-l border-[#CCCBC8] overflow-y-scroll ">
+                        <AiChatFilters />
+                    </div>
+                )}
                 <MapContainer
                     center={[43.65107, -79.347015]}
                     zoom={13}
@@ -107,6 +91,8 @@ const Map = () => {
                     style={{
                         height: '100%',
                         width: isOpenSidebar ? '80%' : '100%',
+                        position: 'relative',
+                        zIndex: 2,
                     }}
                     zoomControl={false}
                 >
@@ -118,16 +104,28 @@ const Map = () => {
                                 : 'http://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}'
                         }
                     />
+                    <FeatureGroup>
+                        <EditControl
+                            position="topright"
+                            draw={{
+                                polyline: false,
+                                circle: false,
+                                rectangle: false,
+                                marker: false,
+                                circlemarker: false,
+                            }}
+                        />
+                    </FeatureGroup>
                     <ZoomControl position="bottomright" />
                     <Control prepend position="bottomright">
                         <div
-                            className="  bg-white rounded-full p-2.5  shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] cursor-pointer"
+                            className="  bg-white rounded-full p-2.5  shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] cursor-pointer -mb-2"
                             onClick={() => setIsVisible(!isVisible)}
                         >
                             {isVisible ? (
-                                <MdDarkMode size={20} />
+                                <Stack size={20} />
                             ) : (
-                                <MdLightMode size={20} />
+                                <StackSimple size={20} />
                             )}
                         </div>
                     </Control>

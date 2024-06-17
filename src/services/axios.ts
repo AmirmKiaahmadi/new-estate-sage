@@ -9,27 +9,26 @@ import { BASE_URL } from './config'
 export const api = Axios.create({
     baseURL: BASE_URL,
     headers: {
-        'Accept-Language': 'fa-IR',
-        'CLIENT-TYPE': 'pwa',
+        // 'access-token': `Bearer 942793b6-5384-4f61-b5ab-339a08756ecc`,
+        // 'fuck-arman': 'yes-fuck',
+        'Content-Type': 'application/x-www-form-urlencoded',
+
+        // 'Content-Type': 'application/json',
     },
 })
 
-api.interceptors.request.use(
-    async (config) => {
-        const userProfile = window.localStorage.getItem('user')
-        userProfile &&
-            userProfile !== 'null' &&
-            config.headers &&
-            (config.headers as AxiosHeaders).set(
-                'Authorization',
-                `JWT ${JSON.parse(userProfile)?.username} `
-            )
-        return config
-    },
-    (error) => {
-        Promise.reject(error)
-    }
-)
+// api.interceptors.request.use(
+//     async (config) => {
+//         ;(config.headers as AxiosHeaders).set(
+//             'access-token',
+//             `942793b6-5384-4f61-b5ab-339a08756ecc`
+//         )
+//         return config
+//     },
+//     (error) => {
+//         Promise.reject(error)
+//     }
+// )
 
 api.interceptors.response.use(
     (response) => {
