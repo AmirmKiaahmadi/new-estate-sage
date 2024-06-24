@@ -3,11 +3,19 @@ import React, { useState } from 'react'
 import AiImage from 'assets/images/map/ai.png'
 import { Button, Input, MessageBox, MessageList } from 'react-chat-elements'
 import TextArea from 'antd/es/input/TextArea'
+import { UseMutateFunction } from 'react-query'
 interface AiChatProps {
     setIsAiChat: React.Dispatch<React.SetStateAction<boolean>>
     setOpenChatAi: any
+    mutate: UseMutateFunction<any, unknown, any, unknown>
+    setAIData: React.Dispatch<React.SetStateAction<any[]>>
 }
-export default function AiChat({ setIsAiChat, setOpenChatAi }: AiChatProps) {
+export default function AiChat({
+    setIsAiChat,
+    setOpenChatAi,
+    mutate,
+    setAIData,
+}: AiChatProps) {
     const [chat, setChat] = useState<any>([])
     const [search, setSearch] = useState<string>('')
 
@@ -27,6 +35,9 @@ export default function AiChat({ setIsAiChat, setOpenChatAi }: AiChatProps) {
         })
 
         setChat(newChat)
+        mutate(search)
+        setSearch('')
+        setAIData([])
         setOpenChatAi([true])
     }
 
@@ -42,9 +53,7 @@ export default function AiChat({ setIsAiChat, setOpenChatAi }: AiChatProps) {
                     className=" cursor-pointer"
                 />
                 <img src={AiImage} alt="ai" className="w-[5] h-[5] mx-auto" />
-                <p className=" text-sm text-center text-[#494745]">
-                    Hello "Amir"
-                </p>
+                <p className=" text-sm text-center text-[#494745]">Hello</p>
                 <p className=" text-sm text-center text-[#494745] mb-2">
                     {' '}
                     Ask me for the house you want!
@@ -67,6 +76,7 @@ export default function AiChat({ setIsAiChat, setOpenChatAi }: AiChatProps) {
                             autoSize
                             className=" mr-2"
                             onChange={(e) => setSearch(e.target.value)}
+                            value={search}
                         />
                         <PaperPlaneRight
                             size={40}

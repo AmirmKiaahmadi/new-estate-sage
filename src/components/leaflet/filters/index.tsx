@@ -9,10 +9,17 @@ import { Cards } from '@phosphor-icons/react/dist/ssr'
 import classNames from 'classnames'
 import React, { useState } from 'react'
 import AiChat from './ai'
+import { UseMutateFunction } from 'react-query'
 interface IFiltersProps {
     setOpenChatAi: React.Dispatch<React.SetStateAction<any[] | undefined>>
+    mutate: UseMutateFunction<any, unknown, any, unknown>
+    setAIData: React.Dispatch<React.SetStateAction<any[]>>
 }
-export default function Filters({ setOpenChatAi }: IFiltersProps) {
+export default function Filters({
+    setOpenChatAi,
+    mutate,
+    setAIData,
+}: IFiltersProps) {
     const [leaseAndSale, setLeaseAndSale] = useState<string>('for lease')
     const [conditions, setConditions] = useState<string>('active')
     const [isAIChat, setIsAiChat] = useState<boolean>(false)
@@ -118,6 +125,8 @@ export default function Filters({ setOpenChatAi }: IFiltersProps) {
                 <AiChat
                     setIsAiChat={setIsAiChat}
                     setOpenChatAi={setOpenChatAi}
+                    mutate={mutate}
+                    setAIData={setAIData}
                 />
             )}
         </>
