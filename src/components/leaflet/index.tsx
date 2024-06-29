@@ -43,6 +43,25 @@ import { EditControl } from 'react-leaflet-draw'
 import 'leaflet-draw/dist/leaflet.draw.css'
 import useGetAiService from './hooks/useGetAiServicde'
 import useGetDiscriptions from './hooks/useGetDiscriptions'
+import PropertyAiFilters from './filters/property'
+import PriceFilter from './filters/price'
+import ActiveFilters from './filters/active'
+import MoreFilters from './filters/more'
+import useGetFeatures from './hooks/useGetFeatures'
+
+export interface IFilters {
+    properties: string[]
+    price: number[]
+    active: string
+    conditions: string
+    leaseAndSale: string
+    more: {
+        keywords: string[]
+        fee: number[]
+        bedrooms: string
+    }
+}
+
 const Map = () => {
     const [isVisible, setIsVisible] = useState<boolean>(false)
     const [isOpenSidebar, setIsOpenSidebar] = useState<boolean>(true)
@@ -53,6 +72,12 @@ const Map = () => {
     const [openChatAi, setOpenChatAi] = useState<
         Array<[number, number, string]> | undefined
     >(undefined)
+    const [isOpenPropertyFilter, setIsOpenPropertyFilter] =
+        useState<boolean>(false)
+    const [isOpenPriceFilter, setIsOpenPriceFilter] = useState<boolean>(false)
+    const [isOpenActiveFilter, setIsOpenActiveFilter] = useState<boolean>(false)
+    const [isOpenMoreFilters, setIsOpenMoreFilters] = useState<boolean>(false)
+    const [AIData, setAIData] = useState<any>([])
     const navigate = useNavigate()
     const legalIcon = new Icon({
         iconUrl: LocationIcon,
@@ -61,7 +86,25 @@ const Map = () => {
         popupAnchor: [-3, -76],
     })
     const { mutateDetail, realData } = useGetDiscriptions()
-    const { mutate, AIData, setAIData } = useGetAiService(mutateDetail)
+    const { mutate } = useGetAiService(mutateDetail, setAIData)
+    const { mutateFeatures } = useGetFeatures(mutateDetail, setAIData)
+
+    const [filters, setFilters] = useState<IFilters>({
+        properties: [],
+        price: [0, 4000000],
+        active: 'All date listing',
+        conditions: 'active',
+        leaseAndSale: 'for lease',
+        more: {
+            keywords: [],
+            fee: [],
+            bedrooms: '',
+        },
+    })
+
+    useEffect(() => {
+        mutateFeatures(filters)
+    }, [filters])
 
     return (
         <>
@@ -77,12 +120,59 @@ const Map = () => {
                             setOpenChatAi={setOpenChatAi}
                             mutate={mutate}
                             setAIData={setAIData}
+                            setIsOpenPropertyFilter={setIsOpenPropertyFilter}
+                            isOpenPropertyFilter={isOpenPropertyFilter}
+                            setIsOpenPriceFilter={setIsOpenPriceFilter}
+                            isOpenPriceFilter={isOpenPriceFilter}
+                            setIsOpenActiveFilter={setIsOpenActiveFilter}
+                            filters={filters}
+                            setFilters={setFilters}
+                            setIsOpenMoreFilters={setIsOpenMoreFilters}
                         />
                     </div>
                 )}
                 {openChatAi && (
                     <div className=" h-full w-[25%]  p-2 relative shadow-[21px 7px 35px -3px rgba(0,0,0,0.48)] border-l border-[#CCCBC8] overflow-y-scroll ">
-                        <AiChatFilters AIData={realData} firstData={AIData} />
+                        <AiChatFilters
+                            AIData={realData}
+                            firstData={AIData}
+                            setIsOpenPropertyFilter={setIsOpenPropertyFilter}
+                        />
+                    </div>
+                )}
+                {isOpenPropertyFilter && (
+                    <div className=" h-full w-[25%]  p-2 relative shadow-[21px 7px 35px -3px rgba(0,0,0,0.48)] border-l border-[#CCCBC8] overflow-y-scroll ">
+                        <PropertyAiFilters
+                            setFilters={setFilters}
+                            filters={filters}
+                            setIsOpenPropertyFilter={setIsOpenPropertyFilter}
+                        />
+                    </div>
+                )}
+                {isOpenPriceFilter && (
+                    <div className=" h-full w-[25%]  p-2 relative shadow-[21px 7px 35px -3px rgba(0,0,0,0.48)] border-l border-[#CCCBC8] overflow-y-scroll ">
+                        <PriceFilter
+                            setFilters={setFilters}
+                            filters={filters}
+                            setIsOpenPriceFilter={setIsOpenPriceFilter}
+                        />
+                    </div>
+                )}
+                {isOpenActiveFilter && (
+                    <div className=" h-full w-[25%]  p-2 relative shadow-[21px 7px 35px -3px rgba(0,0,0,0.48)] border-l border-[#CCCBC8] overflow-y-scroll ">
+                        <ActiveFilters
+                            setIsOpenActiveFilter={setIsOpenActiveFilter}
+                            setFilters={setFilters}
+                            filters={filters}
+                        />
+                    </div>
+                )}
+                {isOpenMoreFilters && (
+                    <div className=" h-full w-[25%]  p-2 relative shadow-[21px 7px 35px -3px rgba(0,0,0,0.48)] border-l border-[#CCCBC8] overflow-y-scroll ">
+                        <MoreFilters
+                            setFilters={setFilters}
+                            filters={filters}
+                        />
                     </div>
                 )}
                 <MapContainer
@@ -153,94 +243,106 @@ const Map = () => {
                                 }
                             }}
                         >
-                            {AIData.map((address, index) => (
-                                <Marker
-                                    key={index}
-                                    position={[
-                                        address.latitude,
-                                        address.longitude,
-                                    ]}
-                                    title="point"
-                                    icon={legalIcon}
-                                >
-                                    <Popup>
-                                        <div
-                                            style={popupContent}
-                                            className=" cursor-pointer"
-                                            onClick={() => setOpenDetail(true)}
+                            {AIData &&
+                                JSON.parse(AIData).map(
+                                    (address: any, index: any) => (
+                                        <Marker
+                                            key={index}
+                                            position={[
+                                                address.latitude,
+                                                address.longitude,
+                                            ]}
+                                            title="point"
+                                            icon={legalIcon}
                                         >
-                                            <Card
-                                                hoverable
-                                                style={{
-                                                    width: 500,
-                                                }}
-                                                className=" relative"
-                                                bodyStyle={{ padding: '15px' }}
-                                            >
-                                                <div className=" flex justify-between ">
-                                                    <div className=" w-1/2 relative  ">
-                                                        <img
-                                                            alt="example"
-                                                            src={House}
-                                                            className=" rounded-md"
-                                                        />
-                                                        <span className=" absolute bottom-2 left-2 bg-white rounded-full py-1 px-5 text-primary text-xs text-center">
-                                                            For Sale
-                                                        </span>
-                                                    </div>
-                                                    <div className=" w-2/3 text-left p-2 text-lg  h-full relative -mt-8 ">
-                                                        <span className=" text-xs absolute top-6 -right-2 px-3 py-1 rounded-full bg-primary text-white text-center">
-                                                            8 days ago
-                                                        </span>
-                                                        <p className=" pt-5">
-                                                            Listed :{' '}
-                                                            <span className=" text-primary">
-                                                                ${' '}
-                                                                {Number(
-                                                                    579000
-                                                                ).toLocaleString()}
-                                                            </span>
-                                                        </p>
-                                                        <span>Detached</span>
-                                                        <div className="flex items-center mt-2">
-                                                            <FaLocationDot
-                                                                color="#009579"
-                                                                size={15}
-                                                            />
+                                            <Popup>
+                                                <div
+                                                    style={popupContent}
+                                                    className=" cursor-pointer"
+                                                    onClick={() =>
+                                                        setOpenDetail(true)
+                                                    }
+                                                >
+                                                    <Card
+                                                        hoverable
+                                                        style={{
+                                                            width: 500,
+                                                        }}
+                                                        className=" relative"
+                                                        bodyStyle={{
+                                                            padding: '15px',
+                                                        }}
+                                                    >
+                                                        <div className=" flex justify-between ">
+                                                            <div className=" w-1/2 relative  ">
+                                                                <img
+                                                                    alt="example"
+                                                                    src={House}
+                                                                    className=" rounded-md"
+                                                                />
+                                                                <span className=" absolute bottom-2 left-2 bg-white rounded-full py-1 px-5 text-primary text-xs text-center">
+                                                                    For Sale
+                                                                </span>
+                                                            </div>
+                                                            <div className=" w-2/3 text-left p-2 text-lg  h-full relative -mt-8 ">
+                                                                <span className=" text-xs absolute top-6 -right-2 px-3 py-1 rounded-full bg-primary text-white text-center">
+                                                                    8 days ago
+                                                                </span>
+                                                                <p className=" pt-5">
+                                                                    Listed :{' '}
+                                                                    <span className=" text-primary">
+                                                                        ${' '}
+                                                                        {Number(
+                                                                            579000
+                                                                        ).toLocaleString()}
+                                                                    </span>
+                                                                </p>
+                                                                <span>
+                                                                    Detached
+                                                                </span>
+                                                                <div className="flex items-center mt-2">
+                                                                    <FaLocationDot
+                                                                        color="#009579"
+                                                                        size={
+                                                                            15
+                                                                        }
+                                                                    />
 
-                                                            <span className=" text-sm mx-1 ">
-                                                                Toronto -
-                                                                Church-Yonge
-                                                                Corridor
-                                                            </span>
+                                                                    <span className=" text-sm mx-1 ">
+                                                                        Toronto
+                                                                        -
+                                                                        Church-Yonge
+                                                                        Corridor
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <div className=" flex items-center justify-center absolute bottom-3  right-2">
+                                                                <FaSquareParking
+                                                                    color="#009579"
+                                                                    size={30}
+                                                                    className=" mx-3"
+                                                                />
+                                                                <span>1</span>
+                                                                <MdBathroom
+                                                                    color="#009579"
+                                                                    size={30}
+                                                                    className=" mx-3"
+                                                                />
+                                                                <span>2</span>
+                                                                <MdBedroomParent
+                                                                    color="#009579"
+                                                                    size={30}
+                                                                    className=" mx-3"
+                                                                />
+                                                                <span>2</span>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div className=" flex items-center justify-center absolute bottom-3  right-2">
-                                                        <FaSquareParking
-                                                            color="#009579"
-                                                            size={30}
-                                                            className=" mx-3"
-                                                        />
-                                                        <span>1</span>
-                                                        <MdBathroom
-                                                            color="#009579"
-                                                            size={30}
-                                                            className=" mx-3"
-                                                        />
-                                                        <span>2</span>
-                                                        <MdBedroomParent
-                                                            color="#009579"
-                                                            size={30}
-                                                            className=" mx-3"
-                                                        />
-                                                        <span>2</span>
-                                                    </div>
+                                                    </Card>
                                                 </div>
-                                            </Card>
-                                        </div>
-                                    </Popup>
-                                </Marker>
-                            ))}
+                                            </Popup>
+                                        </Marker>
+                                    )
+                                )}
                         </MarkerClusterGroup>
                     )}
                 </MapContainer>

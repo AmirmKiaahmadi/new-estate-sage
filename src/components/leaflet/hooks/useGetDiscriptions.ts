@@ -10,8 +10,8 @@ export default function useGetDiscriptions() {
         },
         onSuccess: (data) => {
             if (data && data.data) {
-                const fuck = JSON.parse(data.data)
-                setRealData((prev) => [...prev, fuck[0]])
+                const data1 = JSON.parse(data.data)
+                setRealData((prev) => [...prev, data1[0]])
             }
         },
         onError: () => {},

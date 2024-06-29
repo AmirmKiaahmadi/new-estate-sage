@@ -70,3 +70,17 @@
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px !important;  
     cursor: pointer  !important;
 }
+
+.ant-checkbox-wrapper{
+    margin: 5px 0 !important;
+}
+
+.ant-radio-wrapper .ant-radio-checked .ant-radio-inner {
+    background-color: #9EBB27 !important ;
+    border-color: #9EBB27 !important;
+}
+
+.ant-collapse{
+    background-color: transparent !important;
+    border: none !important;
+}

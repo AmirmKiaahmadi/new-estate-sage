@@ -9,12 +9,16 @@ interface AiChatProps {
     setOpenChatAi: any
     mutate: UseMutateFunction<any, unknown, any, unknown>
     setAIData: React.Dispatch<React.SetStateAction<any[]>>
+    setIsOpenPropertyFilter: React.Dispatch<React.SetStateAction<boolean>>
+    setIsOpenPriceFilter: React.Dispatch<React.SetStateAction<boolean>>
 }
 export default function AiChat({
     setIsAiChat,
     setOpenChatAi,
     mutate,
     setAIData,
+    setIsOpenPropertyFilter,
+    setIsOpenPriceFilter,
 }: AiChatProps) {
     const [chat, setChat] = useState<any>([])
     const [search, setSearch] = useState<string>('')
@@ -42,13 +46,15 @@ export default function AiChat({
     }
 
     return (
-        <div className=" h-[65%]">
-            <div className=" grow-0">
+        <div className=" h-[65%] ">
+            <div className=" grow-0 ">
                 <ArrowLeft
                     size={20}
                     onClick={() => {
                         setIsAiChat(false)
                         setOpenChatAi(undefined)
+                        setIsOpenPropertyFilter(false)
+                        setIsOpenPriceFilter(false)
                     }}
                     className=" cursor-pointer"
                 />
@@ -59,8 +65,8 @@ export default function AiChat({
                     Ask me for the house you want!
                 </p>
             </div>
-            <div className="  flex flex-col h-full ">
-                <div className="grow">
+            <div className="  flex flex-col h-full  ">
+                <div className="grow overflow-y-scroll">
                     {/* @ts-ignore */}
                     <MessageList
                         className="message-list overflow-hidden text-sm"

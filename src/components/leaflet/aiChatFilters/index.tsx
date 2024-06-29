@@ -15,11 +15,16 @@ import { Spin } from 'antd'
 interface IAiFiltersProps {
     AIData: any[]
     firstData: any[]
+    setIsOpenPropertyFilter: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export default function AiChatFilters({ AIData, firstData }: IAiFiltersProps) {
+export default function AiChatFilters({
+    AIData,
+    firstData,
+    setIsOpenPropertyFilter,
+}: IAiFiltersProps) {
     const [data, setData] = useState<any[]>([])
-    console.log('firstData', firstData)
+
     useEffect(() => {
         if (firstData.length === 0) {
             setData([])
@@ -122,6 +127,8 @@ export default function AiChatFilters({ AIData, firstData }: IAiFiltersProps) {
                         </div>
                     </div>
                 ))
+            ) : data.length === 0 ? (
+                <p className=" text-sm">I cant find anything...</p>
             ) : (
                 <Spin className=" text-center items-center" />
             )}
