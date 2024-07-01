@@ -11,11 +11,10 @@ export default function useGetFeatures(
             return aiServiceFeatures(payload)
         },
         onSuccess: (data) => {
-            console.log('print', data)
             if (data && data.data && data.data.output_from_query_ids) {
                 setAIData(data.data.output_from_query_ids)
-                const firstData = JSON.parse(data.data.output_from_query_ids)
-                console.log('firstData', firstData)
+                const firstData = data.data.output_from_query_ids
+
                 firstData.map((item: any) => mutateDetail(item))
             }
         },

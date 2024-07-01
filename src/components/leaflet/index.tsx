@@ -85,8 +85,16 @@ const Map = () => {
         iconAnchor: [22, 94],
         popupAnchor: [-3, -76],
     })
+    const [chat, setChat] = useState<any>([])
+    const [search, setSearch] = useState<string>('')
     const { mutateDetail, realData } = useGetDiscriptions()
-    const { mutate } = useGetAiService(mutateDetail, setAIData)
+    const { mutate } = useGetAiService(
+        mutateDetail,
+        setAIData,
+        setChat,
+        chat,
+        search
+    )
     const { mutateFeatures } = useGetFeatures(mutateDetail, setAIData)
 
     const [filters, setFilters] = useState<IFilters>({
@@ -128,6 +136,10 @@ const Map = () => {
                             filters={filters}
                             setFilters={setFilters}
                             setIsOpenMoreFilters={setIsOpenMoreFilters}
+                            setChat={setChat}
+                            chat={chat}
+                            setSearch={setSearch}
+                            search={search}
                         />
                     </div>
                 )}
@@ -244,105 +256,100 @@ const Map = () => {
                             }}
                         >
                             {AIData &&
-                                JSON.parse(AIData).map(
-                                    (address: any, index: any) => (
-                                        <Marker
-                                            key={index}
-                                            position={[
-                                                address.latitude,
-                                                address.longitude,
-                                            ]}
-                                            title="point"
-                                            icon={legalIcon}
-                                        >
-                                            <Popup>
-                                                <div
-                                                    style={popupContent}
-                                                    className=" cursor-pointer"
-                                                    onClick={() =>
-                                                        setOpenDetail(true)
-                                                    }
+                                AIData.map((address: any, index: any) => (
+                                    <Marker
+                                        key={index}
+                                        position={[
+                                            address.latitude,
+                                            address.longitude,
+                                        ]}
+                                        title="point"
+                                        icon={legalIcon}
+                                    >
+                                        <Popup>
+                                            <div
+                                                style={popupContent}
+                                                className=" cursor-pointer"
+                                                onClick={() =>
+                                                    setOpenDetail(true)
+                                                }
+                                            >
+                                                <Card
+                                                    hoverable
+                                                    style={{
+                                                        width: 500,
+                                                    }}
+                                                    className=" relative"
+                                                    bodyStyle={{
+                                                        padding: '15px',
+                                                    }}
                                                 >
-                                                    <Card
-                                                        hoverable
-                                                        style={{
-                                                            width: 500,
-                                                        }}
-                                                        className=" relative"
-                                                        bodyStyle={{
-                                                            padding: '15px',
-                                                        }}
-                                                    >
-                                                        <div className=" flex justify-between ">
-                                                            <div className=" w-1/2 relative  ">
-                                                                <img
-                                                                    alt="example"
-                                                                    src={House}
-                                                                    className=" rounded-md"
+                                                    <div className=" flex justify-between ">
+                                                        <div className=" w-1/2 relative  ">
+                                                            <img
+                                                                alt="example"
+                                                                src={House}
+                                                                className=" rounded-md"
+                                                            />
+                                                            <span className=" absolute bottom-2 left-2 bg-white rounded-full py-1 px-5 text-primary text-xs text-center">
+                                                                For Sale
+                                                            </span>
+                                                        </div>
+                                                        <div className=" w-2/3 text-left p-2 text-lg  h-full relative -mt-8 ">
+                                                            <span className=" text-xs absolute top-6 -right-2 px-3 py-1 rounded-full bg-primary text-white text-center">
+                                                                8 days ago
+                                                            </span>
+                                                            <p className=" pt-5">
+                                                                Listed :{' '}
+                                                                <span className=" text-primary">
+                                                                    ${' '}
+                                                                    {Number(
+                                                                        579000
+                                                                    ).toLocaleString()}
+                                                                </span>
+                                                            </p>
+                                                            <span>
+                                                                Detached
+                                                            </span>
+                                                            <div className="flex items-center mt-2">
+                                                                <FaLocationDot
+                                                                    color="#009579"
+                                                                    size={15}
                                                                 />
-                                                                <span className=" absolute bottom-2 left-2 bg-white rounded-full py-1 px-5 text-primary text-xs text-center">
-                                                                    For Sale
-                                                                </span>
-                                                            </div>
-                                                            <div className=" w-2/3 text-left p-2 text-lg  h-full relative -mt-8 ">
-                                                                <span className=" text-xs absolute top-6 -right-2 px-3 py-1 rounded-full bg-primary text-white text-center">
-                                                                    8 days ago
-                                                                </span>
-                                                                <p className=" pt-5">
-                                                                    Listed :{' '}
-                                                                    <span className=" text-primary">
-                                                                        ${' '}
-                                                                        {Number(
-                                                                            579000
-                                                                        ).toLocaleString()}
-                                                                    </span>
-                                                                </p>
-                                                                <span>
-                                                                    Detached
-                                                                </span>
-                                                                <div className="flex items-center mt-2">
-                                                                    <FaLocationDot
-                                                                        color="#009579"
-                                                                        size={
-                                                                            15
-                                                                        }
-                                                                    />
 
-                                                                    <span className=" text-sm mx-1 ">
-                                                                        Toronto
-                                                                        -
-                                                                        Church-Yonge
-                                                                        Corridor
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                            <div className=" flex items-center justify-center absolute bottom-3  right-2">
-                                                                <FaSquareParking
-                                                                    color="#009579"
-                                                                    size={30}
-                                                                    className=" mx-3"
-                                                                />
-                                                                <span>1</span>
-                                                                <MdBathroom
-                                                                    color="#009579"
-                                                                    size={30}
-                                                                    className=" mx-3"
-                                                                />
-                                                                <span>2</span>
-                                                                <MdBedroomParent
-                                                                    color="#009579"
-                                                                    size={30}
-                                                                    className=" mx-3"
-                                                                />
-                                                                <span>2</span>
+                                                                <span className=" text-sm mx-1 ">
+                                                                    Toronto -
+                                                                    Church-Yonge
+                                                                    Corridor
+                                                                </span>
                                                             </div>
                                                         </div>
-                                                    </Card>
-                                                </div>
-                                            </Popup>
-                                        </Marker>
-                                    )
-                                )}
+                                                        <div className=" flex items-center justify-center absolute bottom-3  right-2">
+                                                            <FaSquareParking
+                                                                color="#009579"
+                                                                size={30}
+                                                                className=" mx-3"
+                                                            />
+                                                            <span>1</span>
+                                                            <MdBathroom
+                                                                color="#009579"
+                                                                size={30}
+                                                                className=" mx-3"
+                                                            />
+                                                            <span>2</span>
+                                                            <MdBedroomParent
+                                                                color="#009579"
+                                                                size={30}
+                                                                className=" mx-3"
+                                                            />
+                                                            <span>2</span>
+                                                        </div>
+                                                    </div>
+                                                </Card>
+                                            </div>
+                                        </Popup>
+                                    </Marker>
+                                ))}
                         </MarkerClusterGroup>
                     )}
                 </MapContainer>

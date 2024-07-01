@@ -23,6 +23,11 @@ interface IFiltersProps {
     filters: IFilters
     setFilters: React.Dispatch<React.SetStateAction<IFilters>>
     setIsOpenMoreFilters: React.Dispatch<React.SetStateAction<boolean>>
+    setChat: React.Dispatch<any>
+    chat: any
+    setSearch: React.Dispatch<React.SetStateAction<string>>
+    search: string
+    
 }
 export default function Filters({
     setOpenChatAi,
@@ -36,8 +41,13 @@ export default function Filters({
     filters,
     setFilters,
     setIsOpenMoreFilters,
+    setChat,
+    chat,
+    setSearch,
+    search,
 }: IFiltersProps) {
     const [isAIChat, setIsAiChat] = useState<boolean>(false)
+
     return (
         <>
             {!isAIChat ? (
@@ -244,6 +254,10 @@ export default function Filters({
                     setAIData={setAIData}
                     setIsOpenPropertyFilter={setIsOpenPropertyFilter}
                     setIsOpenPriceFilter={setIsOpenPriceFilter}
+                    setChat={setChat}
+                    chat={chat}
+                    setSearch={setSearch}
+                    search={search}
                 />
             )}
         </>

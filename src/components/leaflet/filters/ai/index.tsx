@@ -11,6 +11,10 @@ interface AiChatProps {
     setAIData: React.Dispatch<React.SetStateAction<any[]>>
     setIsOpenPropertyFilter: React.Dispatch<React.SetStateAction<boolean>>
     setIsOpenPriceFilter: React.Dispatch<React.SetStateAction<boolean>>
+    setChat: React.Dispatch<any>
+    chat: any
+    setSearch: React.Dispatch<React.SetStateAction<string>>
+    search: string
 }
 export default function AiChat({
     setIsAiChat,
@@ -19,10 +23,11 @@ export default function AiChat({
     setAIData,
     setIsOpenPropertyFilter,
     setIsOpenPriceFilter,
+    setChat,
+    chat,
+    setSearch,
+    search,
 }: AiChatProps) {
-    const [chat, setChat] = useState<any>([])
-    const [search, setSearch] = useState<string>('')
-
     const handleChat = () => {
         const newChat = [...chat]
         newChat.push({
@@ -31,13 +36,6 @@ export default function AiChat({
             title: 'Amir',
             text: search,
         })
-        newChat.push({
-            position: 'left',
-            type: 'text',
-            title: 'EstateSage AI',
-            text: 'ok . please wait...',
-        })
-
         setChat(newChat)
         mutate(search)
         setSearch('')
