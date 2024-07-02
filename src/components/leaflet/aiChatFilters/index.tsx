@@ -25,6 +25,11 @@ export default function AiChatFilters({
 }: IAiFiltersProps) {
     const [data, setData] = useState<any[]>([])
 
+
+    useEffect(() => {
+        setData([])
+    } , [])
+
     useEffect(() => {
         if (firstData.length === 0) {
             setData([])
@@ -55,7 +60,7 @@ export default function AiChatFilters({
 
     return (
         <>
-            {data.length > 0 ? (
+            {firstData && firstData.length > 0 && data.length > 0 && (
                 data.map((item) => (
                     <div className=" p-1 rounded-lg border border-[#CCCBC8] cursor-pointer">
                         <img
@@ -127,11 +132,7 @@ export default function AiChatFilters({
                         </div>
                     </div>
                 ))
-            ) : data.length === 0 ? (
-                <p className=" text-sm">I cant find anything...</p>
-            ) : (
-                <Spin className=" text-center items-center" />
-            )}
+            ) }
         </>
     )
 }

@@ -9,7 +9,7 @@ import {
 } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import { addressPoints } from './utils'
-import { Icon } from 'leaflet'
+import { Icon, LatLng } from 'leaflet'
 import LocationIcon from 'assets/images/map/location.png'
 import { popupContent, popupHead, popupText, okText } from './popUp/style'
 import House from 'assets/images/house/5c261_1.jpg'
@@ -78,6 +78,7 @@ const Map = () => {
     const [isOpenActiveFilter, setIsOpenActiveFilter] = useState<boolean>(false)
     const [isOpenMoreFilters, setIsOpenMoreFilters] = useState<boolean>(false)
     const [AIData, setAIData] = useState<any>([])
+    const [selectedMarker , setSelectedMarker] = useState<any | undefined>()
     const navigate = useNavigate()
     const legalIcon = new Icon({
         iconUrl: LocationIcon,
@@ -93,7 +94,8 @@ const Map = () => {
         setAIData,
         setChat,
         chat,
-        search
+        search,
+        setOpenChatAi
     )
     const { mutateFeatures } = useGetFeatures(mutateDetail, setAIData)
 
@@ -113,6 +115,14 @@ const Map = () => {
     useEffect(() => {
         mutateFeatures(filters)
     }, [filters])
+
+    const handleFindMarkerDetail = (value : any) => {
+        const findMarkerDetail = realData.find((item : any)  => item.latitude === value.lat && item.longitude === value.lng)
+        if(findMarkerDetail){
+            setSelectedMarker(findMarkerDetail)
+        }
+    }
+
 
     return (
         <>
@@ -140,6 +150,7 @@ const Map = () => {
                             chat={chat}
                             setSearch={setSearch}
                             search={search}
+
                         />
                     </div>
                 )}
@@ -236,24 +247,25 @@ const Map = () => {
                         <MarkerClusterGroup
                             chunkedLoading
                             showCoverageOnHover={false}
-                            onClick={(e: any) => {
-                                if (e.layer.getAllChildMarkers().length > 3) {
-                                    const newChildrens: Array<
-                                        [number, number, string]
-                                    > = []
-                                    e.layer
-                                        .getAllChildMarkers()
-                                        .map((item: any) => {
-                                            newChildrens.push([
-                                                item._latlng.lat,
-                                                item._latlng.lng,
-                                                item.options.title,
-                                            ])
-                                        })
-                                    setChildrens(newChildrens)
-                                    setIsOpenSidebar(true)
-                                }
-                            }}
+                            // onClick={(e: any) => {
+                            //     console.log("e" , e)
+                            //     if (e.layer.getAllChildMarkers().length > 3) {
+                            //         const newChildrens: Array<
+                            //             [number, number, string]
+                            //         > = []
+                            //         e.layer
+                            //             .getAllChildMarkers()
+                            //             .map((item: any) => {
+                            //                 newChildrens.push([
+                            //                     item._latlng.lat,
+                            //                     item._latlng.lng,
+                            //                     item.options.title,
+                            //                 ])
+                            //             })
+                            //         setChildrens(newChildrens)
+                            //         setIsOpenSidebar(true)
+                            //     }
+                            // }}
                         >
                             {AIData &&
                                 AIData.map((address: any, index: any) => (
@@ -265,8 +277,16 @@ const Map = () => {
                                         ]}
                                         title="point"
                                         icon={legalIcon}
+                                       
+
+                                            eventHandlers={{
+                                                click: (e) => {
+                                                  handleFindMarkerDetail(e.latlng)
+                                                },
+                                              }}
                                     >
-                                        <Popup>
+                                        {selectedMarker && (
+                                            <Popup >
                                             <div
                                                 style={popupContent}
                                                 className=" cursor-pointer"
@@ -277,77 +297,86 @@ const Map = () => {
                                                 <Card
                                                     hoverable
                                                     style={{
-                                                        width: 500,
+                                                        width: 400,
                                                     }}
                                                     className=" relative"
                                                     bodyStyle={{
                                                         padding: '15px',
                                                     }}
                                                 >
-                                                    <div className=" flex justify-between ">
-                                                        <div className=" w-1/2 relative  ">
-                                                            <img
-                                                                alt="example"
-                                                                src={House}
-                                                                className=" rounded-md"
-                                                            />
-                                                            <span className=" absolute bottom-2 left-2 bg-white rounded-full py-1 px-5 text-primary text-xs text-center">
-                                                                For Sale
-                                                            </span>
-                                                        </div>
-                                                        <div className=" w-2/3 text-left p-2 text-lg  h-full relative -mt-8 ">
-                                                            <span className=" text-xs absolute top-6 -right-2 px-3 py-1 rounded-full bg-primary text-white text-center">
-                                                                8 days ago
-                                                            </span>
-                                                            <p className=" pt-5">
-                                                                Listed :{' '}
-                                                                <span className=" text-primary">
-                                                                    ${' '}
-                                                                    {Number(
-                                                                        579000
-                                                                    ).toLocaleString()}
-                                                                </span>
-                                                            </p>
-                                                            <span>
-                                                                Detached
-                                                            </span>
-                                                            <div className="flex items-center mt-2">
-                                                                <FaLocationDot
-                                                                    color="#009579"
-                                                                    size={15}
-                                                                />
-
-                                                                <span className=" text-sm mx-1 ">
-                                                                    Toronto -
-                                                                    Church-Yonge
-                                                                    Corridor
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <div className=" flex items-center justify-center absolute bottom-3  right-2">
-                                                            <FaSquareParking
-                                                                color="#009579"
-                                                                size={30}
-                                                                className=" mx-3"
-                                                            />
-                                                            <span>1</span>
-                                                            <MdBathroom
-                                                                color="#009579"
-                                                                size={30}
-                                                                className=" mx-3"
-                                                            />
-                                                            <span>2</span>
-                                                            <MdBedroomParent
-                                                                color="#009579"
-                                                                size={30}
-                                                                className=" mx-3"
-                                                            />
-                                                            <span>2</span>
-                                                        </div>
-                                                    </div>
+                                                   <div className=" p-1 rounded-lg border border-[#CCCBC8] cursor-pointer">
+                        <img
+                            src={`https://cdn.repliers.io/IMG-${selectedMarker.mlsNumber}_1.jpg?class=small`}
+                            alt="example"
+                            className=" w-full h-[150px]"
+                        />
+                        <div className="flex justify-between text-sm items-center my-2">
+                            <div className=" flex items-center">
+                                <p className=" bg-[#E5F0A6] rounded-xl py-1 px-2 mr-1 text-[#7C951B]">
+                                    {selectedMarker.type}
+                                </p>
+                                <p className=" mx-1 text-[#7F7C77]">
+                                    2023.01.23
+                                </p>
+                            </div>
+                            <div className=" flex text-[#595653]">
+                                <ShareNetwork size={20} className=" mx-1" />
+                                <BookmarkSimple size={20} className=" mx-1" />
+                            </div>
+                        </div>
+                        <div className=" my-1 flex text-xs">
+                            <MapPin size={18} className=" text-[#595653]" />
+                            <span className=" text-[#273A38]">
+                                2 jones Avenue, Norfolk, Simcoe...
+                            </span>
+                        </div>
+                        <div className=" flex justify-between text-sm items-center">
+                            <div className="flex items-center">
+                                <p className=" text-red-1">
+                                    $
+                                    {Number(
+                                        selectedMarker.originalPrice
+                                    ).toLocaleString()}
+                                </p>
+                                {/* <p className="text-[#BBBAB6] text-xs mx-2 line-through">
+                                  {item.originalPrice}
+                                </p> */}
+                            </div>
+                            <div className=" flex justify-between">
+                                <div className="flex text-xs">
+                                    <Bathtub
+                                        size={18}
+                                        className=" text-[#595653]"
+                                    />
+                                    <span className=" mx-1 text-[#595653]">
+                                        2
+                                    </span>
+                                </div>
+                                <div className="flex text-xs">
+                                    <Bed
+                                        size={18}
+                                        className=" text-[#595653]"
+                                    />
+                                    <span className=" mx-1 text-[#595653]">
+                                        {selectedMarker.numRooms}
+                                    </span>
+                                </div>
+                                <div className="flex text-xs">
+                                    <Car
+                                        size={18}
+                                        className=" text-[#595653]"
+                                    />
+                                    <span className=" mx-1 text-[#595653]">
+                                        2
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                                                 </Card>
                                             </div>
                                         </Popup>
+                                        )}
                                     </Marker>
                                 ))}
                         </MarkerClusterGroup>

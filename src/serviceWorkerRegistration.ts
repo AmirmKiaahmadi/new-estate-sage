@@ -74,7 +74,6 @@ export function register(config?: Config) {
                                     //@ts-expect-error
                                     cacheName !== STATIC_CACHE_NAME
                                 ) {
-                                    console.log('deleting', cacheName)
                                     return caches.delete(cacheName)
                                 }
                             })

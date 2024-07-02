@@ -10,7 +10,6 @@ export default function PriceModal({
     price,
     setPrice,
 }: IpriceModalProps) {
-    console.log('price', price)
     return (
         <Modal
             title="Price"
