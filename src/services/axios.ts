@@ -6,8 +6,13 @@ import Axios, {
     RawAxiosRequestConfig,
 } from 'axios'
 import { BASE_URL } from './config'
+import https from 'https'
+
 export const api = Axios.create({
     baseURL: BASE_URL,
+    httpsAgent: new https.Agent({
+        rejectUnauthorized: false,
+    }),
     headers: {
         // 'access-token': `Bearer 942793b6-5384-4f61-b5ab-339a08756ecc`,
         // 'fuck-arman': 'yes-fuck',
