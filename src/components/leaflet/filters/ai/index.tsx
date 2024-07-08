@@ -29,6 +29,7 @@ export default function AiChat({
     search,
 }: AiChatProps) {
     const handleChat = () => {
+        setAIData([])
         const newChat = [...chat]
         newChat.push({
             position: 'right',
@@ -39,8 +40,8 @@ export default function AiChat({
         setChat(newChat)
         mutate(search)
         setSearch('')
-        setAIData([])
-        setOpenChatAi([true])
+       
+       
     }
 
     return (
