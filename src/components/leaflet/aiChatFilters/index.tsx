@@ -40,7 +40,12 @@ export default function AiChatFilters({
                 newData.push({
                     mlsNumber: item.mlsNumber,
                     originalPrice: item.originalPrice,
-                    // address: JSON.parse(item.addressreplace(/&quot;/gi, '"')),
+                    address:
+                        item.address.city +
+                        ',' +
+                        item.address.district +
+                        ',' +
+                        item.address.majorIntersection,
                     // bathrooms: JSON.parse(item.bathrooms),
                     latitude: item.latitude,
                     longitude: item.longitude,
@@ -80,7 +85,7 @@ export default function AiChatFilters({
                         <div className=" my-1 flex text-xs">
                             <MapPin size={18} className=" text-[#595653]" />
                             <span className=" text-[#273A38]">
-                                2 jones Avenue, Norfolk, Simcoe...
+                                {item.address}
                             </span>
                         </div>
                         <div className=" flex justify-between text-sm items-center">

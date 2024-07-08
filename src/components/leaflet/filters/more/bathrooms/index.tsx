@@ -6,21 +6,21 @@ interface Props {
     filters: IFilters
 }
 const examples = ['All', '1', '2', '3', '4', '+5']
-export default function Bedrooms({ setFilters, filters }: Props) {
+export default function Bathrooms({ setFilters, filters }: Props) {
     return (
         <div className=" flex flex-wrap">
             {examples.map((item) => (
                 <p
                     className={classNames(
                         ' rounded-md py-2 px-4 mx-1 my-1 cursor-pointer',
-                        filters.more.bedrooms === item
+                        filters.more.bathrooms === item
                             ? 'bg-[#649B92] text-white'
                             : 'border border-[#649B92] text-[#649B92]'
                     )}
                     onClick={() =>
                         setFilters({
                             ...filters,
-                            more: { ...filters.more, bedrooms: item },
+                            more: { ...filters.more, bathrooms: item },
                         })
                     }
                 >

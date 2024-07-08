@@ -11,6 +11,7 @@ import React, { useState } from 'react'
 import AiChat from './ai'
 import { UseMutateFunction } from 'react-query'
 import { IFilters } from '..'
+import { initialFilters } from 'utilities/helper/const'
 interface IFiltersProps {
     setOpenChatAi: React.Dispatch<React.SetStateAction<any[] | undefined>>
     mutate: UseMutateFunction<any, unknown, any, unknown>
@@ -27,7 +28,6 @@ interface IFiltersProps {
     chat: any
     setSearch: React.Dispatch<React.SetStateAction<string>>
     search: string
-    
 }
 export default function Filters({
     setOpenChatAi,
@@ -242,7 +242,10 @@ export default function Filters({
                             <span className=" text-sm mx-2">Watched Area</span>
                         </div>
                     </div>
-                    <div className=" border border-[#9EBB27] text-[#9EBB27] rounded-lg py-2 text-center cursor-pointer">
+                    <div
+                        className=" border border-[#9EBB27] text-[#9EBB27] rounded-lg py-2 text-center cursor-pointer"
+                        onClick={() => setFilters(initialFilters)}
+                    >
                         Clear All Filters
                     </div>
                 </div>

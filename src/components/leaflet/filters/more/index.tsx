@@ -5,6 +5,15 @@ import KeyWords from './keywords'
 import { IFilters } from 'components/leaflet'
 import Fee from './fee'
 import Bedrooms from './bedrooms'
+import Bathrooms from './bathrooms'
+import Kitchen from './kitchen'
+import Garage from './garage'
+import ParkingType from './parkingType'
+import Basement from './basement'
+import OpenHouse from './openHouse'
+import ListingType from './listingType'
+import SquareFootage from './squareFootage'
+import { initialFilters } from 'utilities/helper/const'
 
 const text = `
   A dog is a type of domesticated animal.
@@ -37,47 +46,69 @@ export default function MoreFilters({ setFilters, filters }: Props) {
         {
             key: '4',
             label: 'Bathrooms',
-            children: <p>{text}</p>,
+            children: <Bathrooms setFilters={setFilters} filters={filters} />,
         },
         {
             key: '5',
             label: 'Kitchen',
-            children: <p>{text}</p>,
+            children: <Kitchen setFilters={setFilters} filters={filters} />,
         },
         {
             key: '6',
             label: 'Garage/Covered Parking',
-            children: <p>{text}</p>,
+            children: <Garage setFilters={setFilters} filters={filters} />,
         },
         {
             key: '7',
-            label: 'Basement',
-            children: <p>{text}</p>,
+            label: 'Parking Type',
+            children: <ParkingType setFilters={setFilters} filters={filters} />,
         },
         {
             key: '8',
-            label: 'Open House',
-            children: <p>{text}</p>,
+            label: 'Basement',
+            children: <Basement setFilters={setFilters} filters={filters} />,
         },
         {
             key: '9',
-            label: 'Listing Type',
-            children: <p>{text}</p>,
+            label: 'Open House',
+            children: <OpenHouse setFilters={setFilters} filters={filters} />,
         },
         {
             key: '10',
-            label: 'Square Footage',
-            children: <p>{text}</p>,
+            label: 'Listing Type',
+            children: <ListingType setFilters={setFilters} filters={filters} />,
         },
         {
             key: '11',
-            label: 'Lot Front',
-            children: <p>{text}</p>,
+            label: 'Square Footage',
+            children: (
+                <SquareFootage setFilters={setFilters} filters={filters} />
+            ),
         },
+        // {
+        //     key: '12',
+        //     label: 'Lot Front',
+        //     children: <p>{text}</p>,
+        // },
     ]
     return (
-        <>
-            <Collapse accordion items={items} />
-        </>
+        <div className=" h-full flex flex-col">
+            <div className=" grow">
+                <Collapse accordion items={items} />
+            </div>
+            <div className="grow-0">
+                <div className=" flex justify-between">
+                    <button className=" w-full text-white rounded-md bg-[#9EBB27] py-2 mx-1">
+                        Apply
+                    </button>
+                    <button
+                        className=" w-full text-[#9EBB27] rounded-md border border-[#9EBB27] py-2 mx-1"
+                        onClick={() => setFilters(initialFilters)}
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
     )
 }

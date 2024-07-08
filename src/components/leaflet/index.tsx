@@ -48,6 +48,7 @@ import PriceFilter from './filters/price'
 import ActiveFilters from './filters/active'
 import MoreFilters from './filters/more'
 import useGetFeatures from './hooks/useGetFeatures'
+import { initialFilters } from 'utilities/helper/const'
 
 export interface IFilters {
     properties: string[]
@@ -59,6 +60,14 @@ export interface IFilters {
         keywords: string[]
         fee: number[]
         bedrooms: string
+        bathrooms: string
+        kitchen: string
+        garage: string
+        parkingType: string[]
+        basement: string[]
+        openHouse: string
+        listingType: string[]
+        squareFootage: number[]
     }
 }
 
@@ -78,7 +87,6 @@ const Map = () => {
     const [isOpenActiveFilter, setIsOpenActiveFilter] = useState<boolean>(false)
     const [isOpenMoreFilters, setIsOpenMoreFilters] = useState<boolean>(false)
     const [AIData, setAIData] = useState<any>([])
-    const navigate = useNavigate()
     const legalIcon = new Icon({
         iconUrl: LocationIcon,
         iconSize: [35, 35],
@@ -97,18 +105,7 @@ const Map = () => {
     )
     const { mutateFeatures } = useGetFeatures(mutateDetail, setAIData)
 
-    const [filters, setFilters] = useState<IFilters>({
-        properties: [],
-        price: [0, 4000000],
-        active: 'All date listing',
-        conditions: 'active',
-        leaseAndSale: 'for lease',
-        more: {
-            keywords: [],
-            fee: [],
-            bedrooms: '',
-        },
-    })
+    const [filters, setFilters] = useState<IFilters>(initialFilters)
 
     useEffect(() => {
         mutateFeatures(filters)

@@ -2,7 +2,7 @@ import request from '../axios'
 // http://ec2-15-157-68-30.ca-central-1.compute.amazonaws.com:8000/app/search/
 export const aiService = async (payload: any) => {
     const { data }: { data: any } = await request.post(
-        `https://ec2-3-96-165-111.ca-central-1.compute.amazonaws.com:8000/app/search/`,
+        `http://ec2-3-96-165-111.ca-central-1.compute.amazonaws.com:8000/app/search/`,
         {
             q: payload,
             'access-token': '942793b6-5384-4f61-b5ab-339a08756ecc',
@@ -13,7 +13,7 @@ export const aiService = async (payload: any) => {
 export const aiServiceDetail = async (payload1: any) => {
     const payload = JSON.stringify([payload1])
     const { data }: { data: any } = await request.post(
-        `https://ec2-3-96-165-111.ca-central-1.compute.amazonaws.com:8000/app/id_search/`,
+        `http://ec2-3-96-165-111.ca-central-1.compute.amazonaws.com:8000/app/id_search/`,
         {
             data: payload,
         }
@@ -24,7 +24,7 @@ export const aiServiceDetail = async (payload1: any) => {
 export const aiServiceFeatures = async (payload1: any) => {
     const payload = JSON.stringify([payload1])
     const { data }: { data: any } = await request.post(
-        `https://ec2-3-96-165-111.ca-central-1.compute.amazonaws.com:8000/app/feature_search/`,
+        `http://ec2-3-96-165-111.ca-central-1.compute.amazonaws.com:8000/app/feature_search/`,
         {
             feature: payload,
         }
