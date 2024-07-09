@@ -9,14 +9,15 @@ export default function useGetAiService(
     setChat: React.Dispatch<any>,
     chat: any,
     search: string,
-    setOpenChatAi : any
+    setOpenChatAi: any,
+    setRealData: any
 ) {
     const { mutate, isLoading } = useMutation({
         mutationFn: (payload: any) => {
             return aiService(payload)
         },
         onSuccess: (data) => {
-
+            setRealData([])
             const newChat = [...chat]
             newChat.push({
                 position: 'right',
@@ -30,9 +31,13 @@ export default function useGetAiService(
                 title: 'EstateSage AI',
                 text: data.resp,
             })
-            
+
             setChat(newChat)
-            if (data && data.output_from_query_ids && data.output_from_query_ids.length > 0) {
+            if (
+                data &&
+                data.output_from_query_ids &&
+                data.output_from_query_ids.length > 0
+            ) {
                 setOpenChatAi([true])
                 setAIData(data.output_from_query_ids)
                 const firstData = data.output_from_query_ids

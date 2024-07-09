@@ -46,6 +46,7 @@ export default function ActiveFilters({
                             className=" my-2"
                             //@ts-ignore
                             onClick={(e) => setDate(e.target.defaultValue)}
+                            checked={filters.active === item}
                         >
                             {item}
                         </Radio>

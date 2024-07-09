@@ -25,10 +25,9 @@ export default function AiChatFilters({
 }: IAiFiltersProps) {
     const [data, setData] = useState<any[]>([])
 
-
     useEffect(() => {
         setData([])
-    } , [])
+    }, [])
 
     useEffect(() => {
         if (firstData.length === 0) {
@@ -63,10 +62,14 @@ export default function AiChatFilters({
         }
     }, [AIData])
 
+    console.log('aiData', data)
+
     return (
         <>
-            {firstData && firstData.length > 0 && data.length > 0 && (
-                data.map((item) => (
+            {firstData &&
+                firstData.length > 0 &&
+                data.length > 0 &&
+                data.slice(0, 51).map((item) => (
                     <div className=" p-1 rounded-lg border border-[#CCCBC8] cursor-pointer">
                         <img
                             src={`https://cdn.repliers.io/IMG-${item.mlsNumber}_1.jpg?class=small`}
@@ -136,8 +139,7 @@ export default function AiChatFilters({
                             </div>
                         </div>
                     </div>
-                ))
-            ) }
+                ))}
         </>
     )
 }

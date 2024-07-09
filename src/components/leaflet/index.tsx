@@ -88,8 +88,8 @@ const Map = () => {
     const [isOpenMoreFilters, setIsOpenMoreFilters] = useState<boolean>(false)
     const [AIData, setAIData] = useState<any>([])
 
-    const [selectedMarker , setSelectedMarker] = useState<any | undefined>()
-    const navigate = useNavigate()
+    const [selectedMarker, setSelectedMarker] = useState<any | undefined>()
+
     const legalIcon = new Icon({
         iconUrl: LocationIcon,
         iconSize: [35, 35],
@@ -98,14 +98,16 @@ const Map = () => {
     })
     const [chat, setChat] = useState<any>([])
     const [search, setSearch] = useState<string>('')
-    const { mutateDetail, realData } = useGetDiscriptions()
+    const [realData, setRealData] = useState<any[]>([])
+    const { mutateDetail } = useGetDiscriptions(setRealData)
     const { mutate } = useGetAiService(
         mutateDetail,
         setAIData,
         setChat,
         chat,
         search,
-        setOpenChatAi
+        setOpenChatAi,
+        setRealData
     )
     const { mutateFeatures } = useGetFeatures(mutateDetail, setAIData)
 
@@ -115,13 +117,15 @@ const Map = () => {
         mutateFeatures(filters)
     }, [filters])
 
-    const handleFindMarkerDetail = (value : any) => {
-        const findMarkerDetail = realData.find((item : any)  => item.latitude === value.lat && item.longitude === value.lng)
-        if(findMarkerDetail){
+    const handleFindMarkerDetail = (value: any) => {
+        const findMarkerDetail = realData.find(
+            (item: any) =>
+                item.latitude === value.lat && item.longitude === value.lng
+        )
+        if (findMarkerDetail) {
             setSelectedMarker(findMarkerDetail)
         }
     }
-
 
     return (
         <>
@@ -149,7 +153,6 @@ const Map = () => {
                             chat={chat}
                             setSearch={setSearch}
                             search={search}
-
                         />
                     </div>
                 )}
@@ -194,6 +197,7 @@ const Map = () => {
                         <MoreFilters
                             setFilters={setFilters}
                             filters={filters}
+                            setIsOpenActiveFilter={setIsOpenMoreFilters}
                         />
                     </div>
                 )}
@@ -276,105 +280,136 @@ const Map = () => {
                                         ]}
                                         title="point"
                                         icon={legalIcon}
-                                       
-
-                                            eventHandlers={{
-                                                click: (e) => {
-                                                  handleFindMarkerDetail(e.latlng)
-                                                },
-                                              }}
+                                        eventHandlers={{
+                                            click: (e) => {
+                                                handleFindMarkerDetail(e.latlng)
+                                            },
+                                        }}
                                     >
                                         {selectedMarker && (
-                                            <Popup >
-                                            <div
-                                                style={popupContent}
-                                                className=" cursor-pointer"
-                                                onClick={() =>
-                                                    setOpenDetail(true)
-                                                }
-                                            >
-                                                <Card
-                                                    hoverable
-                                                    style={{
-                                                        width: 400,
-                                                    }}
-                                                    className=" relative"
-                                                    bodyStyle={{
-                                                        padding: '15px',
-                                                    }}
+                                            <Popup>
+                                                <div
+                                                    style={popupContent}
+                                                    className=" cursor-pointer"
+                                                    onClick={() =>
+                                                        setOpenDetail(true)
+                                                    }
                                                 >
-                                                   <div className=" p-1 rounded-lg border border-[#CCCBC8] cursor-pointer">
-                        <img
-                            src={`https://cdn.repliers.io/IMG-${selectedMarker.mlsNumber}_1.jpg?class=small`}
-                            alt="example"
-                            className=" w-full h-[150px]"
-                        />
-                        <div className="flex justify-between text-sm items-center my-2">
-                            <div className=" flex items-center">
-                                <p className=" bg-[#E5F0A6] rounded-xl py-1 px-2 mr-1 text-[#7C951B]">
-                                    {selectedMarker.type}
-                                </p>
-                                <p className=" mx-1 text-[#7F7C77]">
-                                    2023.01.23
-                                </p>
-                            </div>
-                            <div className=" flex text-[#595653]">
-                                <ShareNetwork size={20} className=" mx-1" />
-                                <BookmarkSimple size={20} className=" mx-1" />
-                            </div>
-                        </div>
-                        <div className=" my-1 flex text-xs">
-                            <MapPin size={18} className=" text-[#595653]" />
-                            <span className=" text-[#273A38]">
-                                2 jones Avenue, Norfolk, Simcoe...
-                            </span>
-                        </div>
-                        <div className=" flex justify-between text-sm items-center">
-                            <div className="flex items-center">
-                                <p className=" text-red-1">
-                                    $
-                                    {Number(
-                                        selectedMarker.originalPrice
-                                    ).toLocaleString()}
-                                </p>
-                                {/* <p className="text-[#BBBAB6] text-xs mx-2 line-through">
+                                                    <Card
+                                                        hoverable
+                                                        style={{
+                                                            width: 400,
+                                                        }}
+                                                        className=" relative"
+                                                        bodyStyle={{
+                                                            padding: '15px',
+                                                        }}
+                                                    >
+                                                        <div className=" p-1 rounded-lg border border-[#CCCBC8] cursor-pointer">
+                                                            <img
+                                                                src={`https://cdn.repliers.io/IMG-${selectedMarker.mlsNumber}_1.jpg?class=small`}
+                                                                alt="example"
+                                                                className=" w-full h-[150px]"
+                                                            />
+                                                            <div className="flex justify-between text-sm items-center my-2">
+                                                                <div className=" flex items-center">
+                                                                    <p className=" bg-[#E5F0A6] rounded-xl py-1 px-2 mr-1 text-[#7C951B]">
+                                                                        {
+                                                                            selectedMarker.type
+                                                                        }
+                                                                    </p>
+                                                                    <p className=" mx-1 text-[#7F7C77]">
+                                                                        2023.01.23
+                                                                    </p>
+                                                                </div>
+                                                                <div className=" flex text-[#595653]">
+                                                                    <ShareNetwork
+                                                                        size={
+                                                                            20
+                                                                        }
+                                                                        className=" mx-1"
+                                                                    />
+                                                                    <BookmarkSimple
+                                                                        size={
+                                                                            20
+                                                                        }
+                                                                        className=" mx-1"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                            <div className=" my-1 flex text-xs">
+                                                                <MapPin
+                                                                    size={18}
+                                                                    className=" text-[#595653]"
+                                                                />
+                                                                <span className=" text-[#273A38]">
+                                                                    {selectedMarker
+                                                                        .address
+                                                                        .city +
+                                                                        ',' +
+                                                                        selectedMarker
+                                                                            .address
+                                                                            .district +
+                                                                        ',' +
+                                                                        selectedMarker
+                                                                            .address
+                                                                            .majorIntersection}
+                                                                </span>
+                                                            </div>
+                                                            <div className=" flex justify-between text-sm items-center">
+                                                                <div className="flex items-center">
+                                                                    <p className=" text-red-1">
+                                                                        $
+                                                                        {Number(
+                                                                            selectedMarker.originalPrice
+                                                                        ).toLocaleString()}
+                                                                    </p>
+                                                                    {/* <p className="text-[#BBBAB6] text-xs mx-2 line-through">
                                   {item.originalPrice}
                                 </p> */}
-                            </div>
-                            <div className=" flex justify-between">
-                                <div className="flex text-xs">
-                                    <Bathtub
-                                        size={18}
-                                        className=" text-[#595653]"
-                                    />
-                                    <span className=" mx-1 text-[#595653]">
-                                        2
-                                    </span>
-                                </div>
-                                <div className="flex text-xs">
-                                    <Bed
-                                        size={18}
-                                        className=" text-[#595653]"
-                                    />
-                                    <span className=" mx-1 text-[#595653]">
-                                        {selectedMarker.numRooms}
-                                    </span>
-                                </div>
-                                <div className="flex text-xs">
-                                    <Car
-                                        size={18}
-                                        className=" text-[#595653]"
-                                    />
-                                    <span className=" mx-1 text-[#595653]">
-                                        2
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                                                </Card>
-                                            </div>
-                                        </Popup>
+                                                                </div>
+                                                                <div className=" flex justify-between">
+                                                                    <div className="flex text-xs">
+                                                                        <Bathtub
+                                                                            size={
+                                                                                18
+                                                                            }
+                                                                            className=" text-[#595653]"
+                                                                        />
+                                                                        <span className=" mx-1 text-[#595653]">
+                                                                            2
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="flex text-xs">
+                                                                        <Bed
+                                                                            size={
+                                                                                18
+                                                                            }
+                                                                            className=" text-[#595653]"
+                                                                        />
+                                                                        <span className=" mx-1 text-[#595653]">
+                                                                            {
+                                                                                selectedMarker.numRooms
+                                                                            }
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="flex text-xs">
+                                                                        <Car
+                                                                            size={
+                                                                                18
+                                                                            }
+                                                                            className=" text-[#595653]"
+                                                                        />
+                                                                        <span className=" mx-1 text-[#595653]">
+                                                                            2
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </Card>
+                                                </div>
+                                            </Popup>
                                         )}
                                     </Marker>
                                 ))}
@@ -382,10 +417,10 @@ const Map = () => {
                     )}
                 </MapContainer>
             </div>
-            <DetailModal
+            {/* <DetailModal
                 open={openDetail}
                 onHide={() => setOpenDetail(false)}
-            />
+            /> */}
         </>
     )
 }

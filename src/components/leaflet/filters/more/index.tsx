@@ -24,9 +24,14 @@ const text = `
 interface Props {
     setFilters: React.Dispatch<React.SetStateAction<IFilters>>
     filters: IFilters
+    setIsOpenActiveFilter: any
 }
 
-export default function MoreFilters({ setFilters, filters }: Props) {
+export default function MoreFilters({
+    setFilters,
+    filters,
+    setIsOpenActiveFilter,
+}: Props) {
     const items: CollapseProps['items'] = [
         {
             key: '1',
@@ -98,12 +103,20 @@ export default function MoreFilters({ setFilters, filters }: Props) {
             </div>
             <div className="grow-0">
                 <div className=" flex justify-between">
-                    <button className=" w-full text-white rounded-md bg-[#9EBB27] py-2 mx-1">
+                    <button
+                        className=" w-full text-white rounded-md bg-[#9EBB27] py-2 mx-1"
+                        onClick={() => {
+                            setIsOpenActiveFilter(false)
+                        }}
+                    >
                         Apply
                     </button>
                     <button
                         className=" w-full text-[#9EBB27] rounded-md border border-[#9EBB27] py-2 mx-1"
-                        onClick={() => setFilters(initialFilters)}
+                        onClick={() => {
+                            setFilters(initialFilters)
+                            setIsOpenActiveFilter(false)
+                        }}
                     >
                         Cancel
                     </button>
