@@ -1,10 +1,19 @@
 import { motion } from 'framer-motion'
-import { Outlet, useLocation } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import Header from './header'
 import Footer from './footer'
+import { useEffect } from 'react'
 
 export default function MainLayout() {
     const { pathname } = useLocation()
+    const status = localStorage.getItem('status')
+    const navigate = useNavigate()
+    useEffect(() => {
+        if (!status) {
+            localStorage.clear()
+            navigate('/auth/login')
+        }
+    }, [status])
     return (
         <div className="sm:w-full relative ">
             <motion.div
@@ -15,7 +24,7 @@ export default function MainLayout() {
                 transition={{ duration: 0.2 }}
                 className="w-100 vh-100"
             >
-                <div className="  h-screen w-screen flex justify-center items-center flex-col relative">
+                <div className="  h-screen w-screen flex  items-center flex-col relative">
                     <div className=" flex-none bg-primary w-full ">
                         <Header />
                     </div>

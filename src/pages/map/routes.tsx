@@ -16,7 +16,7 @@ export const mapRoutes: RouteObject[] = [
             },
             {
                 index: false,
-                path: 'detail',
+                path: 'detail/:mlsNumber/:latitude/:longitude',
                 element: <Detail />,
             },
         ],

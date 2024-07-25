@@ -4,7 +4,7 @@ export const initialFilters: IFilters = {
     properties: [],
     price: [0, 4000000],
     active: 'All date listing',
-    conditions: 'active',
+    conditions: '',
     leaseAndSale: 'for lease',
     more: {
         keywords: [],

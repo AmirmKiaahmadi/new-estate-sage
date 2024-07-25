@@ -31,6 +31,7 @@
     "react-leaflet-custom-control": "^1.4.0",
     "react-leaflet-draw": "^0.20.4",
     "react-leaflet-markercluster": "^3.0.0-rc1",
+    "react-lightbox-component": "^1.2.1",
     "react-query": "^3.39.3",
     "react-reflex": "^4.2.6",
     "react-router-dom": "^6.22.3",

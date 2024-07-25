@@ -1,3 +1,4 @@
+import { QueryFunction, QueryFunctionContext } from 'react-query'
 import request from '../axios'
 // http://ec2-15-157-68-30.ca-central-1.compute.amazonaws.com:8000/app/search/
 export const aiService = async (payload: any) => {
@@ -32,3 +33,20 @@ export const aiServiceFeatures = async (payload1: any) => {
     return data
 }
 // https://cdn.repliers.io/IMG-C8391984_1.jpg?class=small
+
+export const DetailService = async (ctx: QueryFunctionContext) => {
+    const payload = JSON.stringify([
+        {
+            mlsNumber: ctx.queryKey[1],
+            latitude: ctx.queryKey[2],
+            longitude: ctx.queryKey[3],
+        },
+    ])
+    const { data }: { data: any } = await request.post(
+        `http://ec2-3-96-165-111.ca-central-1.compute.amazonaws.com:8000/app/id_search/`,
+        {
+            data: payload,
+        }
+    )
+    return data.data[0]
+}

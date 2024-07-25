@@ -112,6 +112,7 @@ const Map = () => {
     const { mutateFeatures } = useGetFeatures(mutateDetail, setAIData)
 
     const [filters, setFilters] = useState<IFilters>(initialFilters)
+    const navigate = useNavigate()
 
     useEffect(() => {
         mutateFeatures(filters)
@@ -120,13 +121,13 @@ const Map = () => {
     const handleFindMarkerDetail = (value: any) => {
         const findMarkerDetail = realData.find(
             (item: any) =>
-                item.latitude === value.lat && item.longitude === value.lng
+                Number(item.latitude) === Number(value.lat) &&
+                Number(item.longitude) === Number(value.lng)
         )
         if (findMarkerDetail) {
             setSelectedMarker(findMarkerDetail)
         }
     }
-
     return (
         <>
             <div
@@ -304,8 +305,23 @@ const Map = () => {
                                                         bodyStyle={{
                                                             padding: '15px',
                                                         }}
+
+                                                        // console.log(
+                                                        //     'locatioon',
+                                                        //     window
+                                                        //         .location
+                                                        //         .pathname
+                                                        // )
+                                                        // navigate(
+                                                        //     `detail/${selectedMarker?.mlsNumber}/${selectedMarker.latitude}/${selectedMarker.longitude}`
+                                                        // )
                                                     >
-                                                        <div className=" p-1 rounded-lg border border-[#CCCBC8] cursor-pointer">
+                                                        <a
+                                                            target="_blank"
+                                                            href={`${window.location.pathname}/detail/${selectedMarker?.mlsNumber}/${selectedMarker.latitude}/${selectedMarker.longitude}`}
+                                                            className=" p-1 rounded-lg border border-[#CCCBC8] cursor-pointer"
+                                                            rel="noreferrer"
+                                                        >
                                                             <img
                                                                 src={`https://cdn.repliers.io/IMG-${selectedMarker.mlsNumber}_1.jpg?class=small`}
                                                                 alt="example"
@@ -406,7 +422,7 @@ const Map = () => {
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
+                                                        </a>
                                                     </Card>
                                                 </div>
                                             </Popup>

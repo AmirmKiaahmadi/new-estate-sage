@@ -10,7 +10,17 @@ export default function useGetDiscriptions(setRealData: any) {
         onSuccess: (data) => {
             if (data && data.data) {
                 const data1 = data.data
-                setRealData((prev: any) => [...prev, data1[0]])
+                // [...prev, data1[0]]
+                setRealData((prev: any) => {
+                    const find = prev.find(
+                        (item: any) => item.mlsNumber === data1[0].mlsNumber
+                    )
+                    if (!find) {
+                        return [...prev, data1[0]]
+                    } else {
+                        return [...prev]
+                    }
+                })
             }
         },
         onError: () => {},

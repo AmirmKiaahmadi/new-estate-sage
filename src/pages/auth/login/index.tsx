@@ -21,6 +21,10 @@ export default function Login() {
                 ) {
                     toast.success('Login Successfully')
                     navigate('/map')
+                    localStorage.setItem(
+                        'status',
+                        JSON.stringify({ login: true })
+                    )
                 } else {
                     toast.error('email or password is incurrect')
                 }
