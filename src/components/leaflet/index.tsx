@@ -9,7 +9,7 @@ import {
 } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import { addressPoints } from './utils'
-import { Icon, LatLng } from 'leaflet'
+import { Icon, LatLng, divIcon } from 'leaflet'
 import LocationIcon from 'assets/images/map/location.png'
 import { popupContent, popupHead, popupText, okText } from './popUp/style'
 import House from 'assets/images/house/5c261_1.jpg'
@@ -49,6 +49,12 @@ import ActiveFilters from './filters/active'
 import MoreFilters from './filters/more'
 import useGetFeatures from './hooks/useGetFeatures'
 import { initialFilters } from 'utilities/helper/const'
+import useGetListings from './hooks/useGetListings'
+import moment from 'moment'
+import SelectedListings from './selectedListings'
+import useGetPlaces from './hooks/useGetPlaces'
+import LoadingBar from 'react-top-loading-bar'
+import useSetListingPropertyType from './hooks/useSetListingPropertyType'
 
 export interface IFilters {
     properties: string[]
@@ -65,7 +71,7 @@ export interface IFilters {
         garage: string
         parkingType: string[]
         basement: string[]
-        openHouse: string
+        openHouse: string[]
         listingType: string[]
         squareFootage: number[]
     }
@@ -87,6 +93,7 @@ const Map = () => {
     const [isOpenActiveFilter, setIsOpenActiveFilter] = useState<boolean>(false)
     const [isOpenMoreFilters, setIsOpenMoreFilters] = useState<boolean>(false)
     const [AIData, setAIData] = useState<any>([])
+    const [center , setCenter] = useState<[number , number]>([43.65107, -79.347015])
 
     const [selectedMarker, setSelectedMarker] = useState<any | undefined>()
 
@@ -96,9 +103,18 @@ const Map = () => {
         iconAnchor: [22, 94],
         popupAnchor: [-3, -76],
     })
+  
     const [chat, setChat] = useState<any>([])
     const [search, setSearch] = useState<string>('')
     const [realData, setRealData] = useState<any[]>([])
+    const {places} = useGetPlaces()
+    const [listingMarkers , setListingMarkers] = useState<any[]>([])
+    const [listings , setListings] = useState<any>()
+
+    const { isLoadingListings} = useGetListings(setListingMarkers , setListings)
+    const [selectedListings , setSelectedListings] = useState<any[]>([])
+
+
     const { mutateDetail } = useGetDiscriptions(setRealData)
     const { mutate } = useGetAiService(
         mutateDetail,
@@ -109,27 +125,58 @@ const Map = () => {
         setOpenChatAi,
         setRealData
     )
-    const { mutateFeatures } = useGetFeatures(mutateDetail, setAIData)
+    // const { mutateFeatures } = useGetFeatures(mutateDetail, setAIData)
+    const {mutatePropertyType} = useSetListingPropertyType(setListingMarkers , setListings)
 
     const [filters, setFilters] = useState<IFilters>(initialFilters)
     const navigate = useNavigate()
 
+
     useEffect(() => {
-        mutateFeatures(filters)
+        mutatePropertyType(filters)
     }, [filters])
 
     const handleFindMarkerDetail = (value: any) => {
-        const findMarkerDetail = realData.find(
+        const findMarkerDetail = listings?.listings.find(
             (item: any) =>
-                Number(item.latitude) === Number(value.lat) &&
-                Number(item.longitude) === Number(value.lng)
+                Number(item.map.latitude) === Number(value.lat) &&
+                Number(item.map.longitude) === Number(value.lng)
         )
         if (findMarkerDetail) {
             setSelectedMarker(findMarkerDetail)
         }
     }
+
+    const calculateCenter = (coordinates : any) => {
+        if (coordinates.length === 0) return [43.65107, -79.347015];
+    
+        const latSum = coordinates.reduce((acc : any, coord : any) => acc + coord[0], 0);
+        const lngSum = coordinates.reduce((acc  : any, coord : any) => acc + coord[1], 0);
+    
+        const latCenter = latSum / coordinates.length;
+        const lngCenter = lngSum / coordinates.length;
+
+        return [latCenter, lngCenter];
+    };
+
+    useEffect(() => {
+        if(listingMarkers){
+            const newCenter= calculateCenter(listingMarkers)
+            //@ts-ignore
+            setCenter(newCenter)
+        }
+    } , [listingMarkers])
+
+
+
+
     return (
         <>
+        {isLoadingListings && 
+        <LoadingBar color="#0095a2" progress={isLoadingListings ? 60 : 100}
+        height={3}
+         />
+        }
             <div
                 className={classNames(
                     ' w-screen h-screen relative ',
@@ -154,6 +201,7 @@ const Map = () => {
                             chat={chat}
                             setSearch={setSearch}
                             search={search}
+                            setSelectedListings = {setSelectedListings}
                         />
                     </div>
                 )}
@@ -172,6 +220,7 @@ const Map = () => {
                             setFilters={setFilters}
                             filters={filters}
                             setIsOpenPropertyFilter={setIsOpenPropertyFilter}
+                            
                         />
                     </div>
                 )}
@@ -202,9 +251,15 @@ const Map = () => {
                         />
                     </div>
                 )}
+                {selectedListings && selectedListings.length > 0 && (
+                    <div className=" h-full w-[25%]  p-2 relative shadow-[21px 7px 35px -3px rgba(0,0,0,0.48)] border-l border-[#CCCBC8] overflow-y-scroll ">
+                    <SelectedListings data={selectedListings} />
+                </div>
+                )}
                 <MapContainer
-                    center={[43.65107, -79.347015]}
-                    zoom={13}
+                    key={center.toString()} 
+                    center={center}
+                    zoom={7}
                     scrollWheelZoom={true}
                     style={{
                         height: '100%',
@@ -213,8 +268,10 @@ const Map = () => {
                         zIndex: 2,
                     }}
                     zoomControl={false}
+                    
                 >
                     <TileLayer
+                    
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         url={
                             !isVisible
@@ -247,45 +304,52 @@ const Map = () => {
                             )}
                         </div>
                     </Control>
-                    {AIData.length > 0 && (
+                    {listingMarkers.length > 0 && (
                         <MarkerClusterGroup
+                        
                             chunkedLoading
                             showCoverageOnHover={false}
-                            // onClick={(e: any) => {
-                            //     console.log("e" , e)
-                            //     if (e.layer.getAllChildMarkers().length > 3) {
-                            //         const newChildrens: Array<
-                            //             [number, number, string]
-                            //         > = []
-                            //         e.layer
-                            //             .getAllChildMarkers()
-                            //             .map((item: any) => {
-                            //                 newChildrens.push([
-                            //                     item._latlng.lat,
-                            //                     item._latlng.lng,
-                            //                     item.options.title,
-                            //                 ])
-                            //             })
-                            //         setChildrens(newChildrens)
-                            //         setIsOpenSidebar(true)
-                            //     }
-                            // }}
+                            onClick={(e: any) => {
+                                
+                                if (e.layer.getAllChildMarkers().length > 1) {
+                                   setSelectedMarker(undefined)
+                                    const newChildrens  : any[] = []
+                                    e.layer
+                                        .getAllChildMarkers()
+                                        .map((item: any) => {
+                                            const findListings = listings.listings.find((item2 : any) => Number(item2.map.latitude) === Number( item._latlng.lat) && Number(item2.map.longitude) === item._latlng.lng )
+                                           if(findListings){
+                                            newChildrens.push(findListings)
+                                           }
+                                           
+                                        })  
+                                       
+                                  setOpenChatAi(undefined)
+                                  setIsOpenPropertyFilter(false)
+                                  setIsOpenPriceFilter(false)
+                                  setSelectedListings(newChildrens)
+                                }
+                            }}
                         >
-                            {AIData &&
-                                AIData.map((address: any, index: any) => (
+                            {listingMarkers &&
+                                listingMarkers.map((address: any, index: any) => (
                                     <Marker
-                                        key={index}
-                                        position={[
-                                            address.latitude,
-                                            address.longitude,
-                                        ]}
-                                        title="point"
-                                        icon={legalIcon}
-                                        eventHandlers={{
-                                            click: (e) => {
-                                                handleFindMarkerDetail(e.latlng)
-                                            },
-                                        }}
+                                    key={index}
+                                    position={[address[0], address[1]]}
+                                    eventHandlers={{
+                                        click: (e) => {
+                                            setSelectedListings([]);
+                                            handleFindMarkerDetail(e.latlng);
+                                        },
+                                    }}
+                                    icon={divIcon({
+                                        className: 'custom-icon',
+                                        html: `<div style="background-color: white; color:#4B8179;  text-align: center; padding: 5px;border-radius:10% / 25%;border : 2px solid #4B8179">$ ${ Math.floor(Number(listings?.listings.find((item:any) => 
+                                            Number(item.map.latitude) === address[0] && 
+                                            Number(item.map.longitude) === address[1]
+                                            )?.originalPrice)).toLocaleString() || "N/A" }</div>`,
+                                        iconSize: [80, 35],
+                                    })}
                                     >
                                         {selectedMarker && (
                                             <Popup>
@@ -305,53 +369,33 @@ const Map = () => {
                                                         bodyStyle={{
                                                             padding: '15px',
                                                         }}
-
-                                                        // console.log(
-                                                        //     'locatioon',
-                                                        //     window
-                                                        //         .location
-                                                        //         .pathname
-                                                        // )
-                                                        // navigate(
-                                                        //     `detail/${selectedMarker?.mlsNumber}/${selectedMarker.latitude}/${selectedMarker.longitude}`
-                                                        // )
                                                     >
                                                         <a
                                                             target="_blank"
-                                                            href={`${window.location.pathname}/detail/${selectedMarker?.mlsNumber}/${selectedMarker.latitude}/${selectedMarker.longitude}`}
-                                                            className=" p-1 rounded-lg border border-[#CCCBC8] cursor-pointer"
-                                                            rel="noreferrer"
+                                                            href={`${window.location.pathname}/detail/${selectedMarker?.images[0]}/${selectedMarker.map.latitude}/${selectedMarker.map.longitude}`}
+                                                            className=" rounded-lg cursor-pointer"
+                                                           
                                                         >
+                                                            <div className='grid grid-cols-3 gap-2'>
                                                             <img
-                                                                src={`https://cdn.repliers.io/IMG-${selectedMarker.mlsNumber}_1.jpg?class=small`}
+                                                                src={`https://cdn.repliers.io/IMG-${selectedMarker?.images[0]}?class=small`}
                                                                 alt="example"
-                                                                className=" w-full h-[150px]"
+                                                                className=" col-span-1"
                                                             />
+                                                            <div className=' col-span-2'>
+
                                                             <div className="flex justify-between text-sm items-center my-2">
-                                                                <div className=" flex items-center">
+                                                              
                                                                     <p className=" bg-[#E5F0A6] rounded-xl py-1 px-2 mr-1 text-[#7C951B]">
                                                                         {
                                                                             selectedMarker.type
                                                                         }
                                                                     </p>
                                                                     <p className=" mx-1 text-[#7F7C77]">
-                                                                        2023.01.23
+                                                                        {moment(new Date(selectedMarker.listDate)).format('YYYY-MM-DD')}
                                                                     </p>
-                                                                </div>
-                                                                <div className=" flex text-[#595653]">
-                                                                    <ShareNetwork
-                                                                        size={
-                                                                            20
-                                                                        }
-                                                                        className=" mx-1"
-                                                                    />
-                                                                    <BookmarkSimple
-                                                                        size={
-                                                                            20
-                                                                        }
-                                                                        className=" mx-1"
-                                                                    />
-                                                                </div>
+                                                              
+                                                                
                                                             </div>
                                                             <div className=" my-1 flex text-xs">
                                                                 <MapPin
@@ -380,9 +424,6 @@ const Map = () => {
                                                                             selectedMarker.originalPrice
                                                                         ).toLocaleString()}
                                                                     </p>
-                                                                    {/* <p className="text-[#BBBAB6] text-xs mx-2 line-through">
-                                  {item.originalPrice}
-                                </p> */}
                                                                 </div>
                                                                 <div className=" flex justify-between">
                                                                     <div className="flex text-xs">
@@ -422,15 +463,221 @@ const Map = () => {
                                                                     </div>
                                                                 </div>
                                                             </div>
+
+
+
+
+                                                            </div>
+                                                            </div>
+                                                            
+                                                           
                                                         </a>
                                                     </Card>
                                                 </div>
                                             </Popup>
                                         )}
+                                       
                                     </Marker>
                                 ))}
                         </MarkerClusterGroup>
                     )}
+
+
+
+
+
+
+
+
+
+
+
+{listingMarkers.length > 0 && (
+                        <MarkerClusterGroup
+                        
+                            chunkedLoading
+                            showCoverageOnHover={false}
+                            onClick={(e: any) => {
+                                
+                                if (e.layer.getAllChildMarkers().length > 1) {
+                                   setSelectedMarker(undefined)
+                                    const newChildrens  : any[] = []
+                                    e.layer
+                                        .getAllChildMarkers()
+                                        .map((item: any) => {
+                                            const findListings = listings.listings.find((item2 : any) => Number(item2.map.latitude) === Number( item._latlng.lat) && Number(item2.map.longitude) === item._latlng.lng )
+                                           if(findListings){
+                                            newChildrens.push(findListings)
+                                           }
+                                           
+                                        })  
+                                       
+                                  setOpenChatAi(undefined)
+                                  setIsOpenPropertyFilter(false)
+                                  setIsOpenPriceFilter(false)
+                                  setSelectedListings(newChildrens)
+                                }
+                            }}
+                        >
+                            {listingMarkers &&
+                                listingMarkers.map((address: any, index: any) => (
+                                    <Marker
+                                    key={index}
+                                    position={[address[0], address[1]]}
+                                    eventHandlers={{
+                                        click: (e) => {
+                                            setSelectedListings([]);
+                                            handleFindMarkerDetail(e.latlng);
+                                        },
+                                    }}
+                                    icon={divIcon({
+                                        className: 'custom-icon',
+                                        html: `<div style="background-color: white; color:#4B8179;  text-align: center; padding: 5px;border-radius:10% / 25%;border : 2px solid #4B8179">$ ${ Math.floor(Number(listings?.listings.find((item:any) => 
+                                            Number(item.map.latitude) === address[0] && 
+                                            Number(item.map.longitude) === address[1]
+                                            )?.originalPrice)).toLocaleString() || "N/A" }</div>`,
+                                        iconSize: [80, 35],
+                                    })}
+                                    >
+                                        {selectedMarker && (
+                                            <Popup>
+                                                <div
+                                                    style={popupContent}
+                                                    className=" cursor-pointer"
+                                                    onClick={() =>
+                                                        setOpenDetail(true)
+                                                    }
+                                                >
+                                                    <Card
+                                                        hoverable
+                                                        style={{
+                                                            width: 400,
+                                                        }}
+                                                        className=" relative"
+                                                        bodyStyle={{
+                                                            padding: '15px',
+                                                        }}
+                                                    >
+                                                        <a
+                                                            target="_blank"
+                                                            href={`${window.location.pathname}/detail/${selectedMarker?.images[0]}/${selectedMarker.map.latitude}/${selectedMarker.map.longitude}`}
+                                                            className=" rounded-lg cursor-pointer"
+                                                           
+                                                        >
+                                                            <div className='grid grid-cols-3 gap-2'>
+                                                            <img
+                                                                src={`https://cdn.repliers.io/IMG-${selectedMarker?.images[0]}?class=small`}
+                                                                alt="example"
+                                                                className=" col-span-1"
+                                                            />
+                                                            <div className=' col-span-2'>
+
+                                                            <div className="flex justify-between text-sm items-center my-2">
+                                                              
+                                                                    <p className=" bg-[#E5F0A6] rounded-xl py-1 px-2 mr-1 text-[#7C951B]">
+                                                                        {
+                                                                            selectedMarker.type
+                                                                        }
+                                                                    </p>
+                                                                    <p className=" mx-1 text-[#7F7C77]">
+                                                                        {moment(new Date(selectedMarker.listDate)).format('YYYY-MM-DD')}
+                                                                    </p>
+                                                              
+                                                                
+                                                            </div>
+                                                            <div className=" my-1 flex text-xs">
+                                                                <MapPin
+                                                                    size={18}
+                                                                    className=" text-[#595653]"
+                                                                />
+                                                                <span className=" text-[#273A38]">
+                                                                    {selectedMarker
+                                                                        .address
+                                                                        .city +
+                                                                        ',' +
+                                                                        selectedMarker
+                                                                            .address
+                                                                            .district +
+                                                                        ',' +
+                                                                        selectedMarker
+                                                                            .address
+                                                                            .majorIntersection}
+                                                                </span>
+                                                            </div>
+                                                            <div className=" flex justify-between text-sm items-center">
+                                                                <div className="flex items-center">
+                                                                    <p className=" text-red-1">
+                                                                        $
+                                                                        {Number(
+                                                                            selectedMarker.originalPrice
+                                                                        ).toLocaleString()}
+                                                                    </p>
+                                                                </div>
+                                                                <div className=" flex justify-between">
+                                                                    <div className="flex text-xs">
+                                                                        <Bathtub
+                                                                            size={
+                                                                                18
+                                                                            }
+                                                                            className=" text-[#595653]"
+                                                                        />
+                                                                        <span className=" mx-1 text-[#595653]">
+                                                                            2
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="flex text-xs">
+                                                                        <Bed
+                                                                            size={
+                                                                                18
+                                                                            }
+                                                                            className=" text-[#595653]"
+                                                                        />
+                                                                        <span className=" mx-1 text-[#595653]">
+                                                                            {
+                                                                                selectedMarker.numRooms
+                                                                            }
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="flex text-xs">
+                                                                        <Car
+                                                                            size={
+                                                                                18
+                                                                            }
+                                                                            className=" text-[#595653]"
+                                                                        />
+                                                                        <span className=" mx-1 text-[#595653]">
+                                                                            2
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+
+
+
+                                                            </div>
+                                                            </div>
+                                                            
+                                                           
+                                                        </a>
+                                                    </Card>
+                                                </div>
+                                            </Popup>
+                                        )}
+                                       
+                                    </Marker>
+                                ))}
+                        </MarkerClusterGroup>
+                    )}
+
+
+
+
+
+
+
+
+                    
                 </MapContainer>
             </div>
             {/* <DetailModal

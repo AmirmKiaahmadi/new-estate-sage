@@ -28,6 +28,7 @@ interface IFiltersProps {
     chat: any
     setSearch: React.Dispatch<React.SetStateAction<string>>
     search: string
+    setSelectedListings: React.Dispatch<React.SetStateAction<any[]>>
 }
 export default function Filters({
     setOpenChatAi,
@@ -45,6 +46,7 @@ export default function Filters({
     chat,
     setSearch,
     search,
+    setSelectedListings
 }: IFiltersProps) {
     const [isAIChat, setIsAiChat] = useState<boolean>(false)
 
@@ -61,6 +63,7 @@ export default function Filters({
                                 setIsOpenPriceFilter(false)
                                 setIsOpenActiveFilter(false)
                                 setIsOpenMoreFilters(false)
+                                setSelectedListings([])
                             }}
                         >
                             <HeadCircuit size={20} className=" mx-1" />
@@ -77,7 +80,7 @@ export default function Filters({
                                 onClick={() =>
                                     setFilters({
                                         ...filters,
-                                        leaseAndSale: 'for sale',
+                                        leaseAndSale: 'sale',
                                     })
                                 }
                             >
@@ -93,7 +96,7 @@ export default function Filters({
                                 onClick={() =>
                                     setFilters({
                                         ...filters,
-                                        leaseAndSale: 'for lease',
+                                        leaseAndSale: 'lease',
                                     })
                                 }
                             >
@@ -108,6 +111,7 @@ export default function Filters({
                                 setIsOpenPropertyFilter(true)
                                 setOpenChatAi(undefined)
                                 setIsOpenMoreFilters(false)
+                                setSelectedListings([])
                             }}
                         >
                             <HouseLine
@@ -134,6 +138,7 @@ export default function Filters({
                                 setIsOpenPriceFilter(true)
                                 setOpenChatAi(undefined)
                                 setIsOpenMoreFilters(false)
+                                setSelectedListings([])
                             }}
                         >
                             <CoinVertical
@@ -176,6 +181,7 @@ export default function Filters({
                                     setIsOpenPriceFilter(false)
                                     setOpenChatAi(undefined)
                                     setIsOpenMoreFilters(false)
+                                    setSelectedListings([])
                                 }}
                             >
                                 Active
@@ -197,6 +203,7 @@ export default function Filters({
                                     setIsOpenPriceFilter(false)
                                     setOpenChatAi(undefined)
                                     setIsOpenMoreFilters(false)
+                                    setSelectedListings([])
                                 }}
                             >
                                 Sold
@@ -218,6 +225,7 @@ export default function Filters({
                                     setIsOpenPriceFilter(false)
                                     setOpenChatAi(undefined)
                                     setIsOpenMoreFilters(false)
+                                    setSelectedListings([])
                                 }}
                             >
                                 De-listed
@@ -232,6 +240,7 @@ export default function Filters({
                                 setIsOpenPropertyFilter(false)
                                 setIsOpenPriceFilter(false)
                                 setOpenChatAi(undefined)
+                                setSelectedListings([])
                             }}
                         >
                             <DotsThreeOutline size={20} />
@@ -261,6 +270,7 @@ export default function Filters({
                     chat={chat}
                     setSearch={setSearch}
                     search={search}
+                    setSelectedListings = { setSelectedListings} 
                 />
             )}
         </>

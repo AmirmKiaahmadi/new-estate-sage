@@ -12,10 +12,9 @@ export const api = Axios.create({
 
     headers: {
         // 'access-token': `Bearer 942793b6-5384-4f61-b5ab-339a08756ecc`,
-        // 'fuck-arman': 'yes-fuck',
-        'Content-Type': 'application/x-www-form-urlencoded',
-
-        // 'Content-Type': 'application/json',
+        'content-type': 'application/json',
+        'REPLIERS-API-KEY' : '8kKNyxA2QzZz3wtpdpPfEhPBfzRBYh',
+        accept: 'application/json'
     },
 })
 
@@ -43,8 +42,8 @@ api.interceptors.response.use(
         // toast.error(error?.response?.data?.message)
 
         if (error?.response?.status === 401) {
-            window.localStorage.clear()
-            return (window.location.href = '/auth/login')
+            // window.localStorage.clear()
+            // return (window.location.href = '/auth/login')
         }
 
         return Promise.reject(error)

@@ -15,14 +15,14 @@ export default function OpenHouse({ setFilters, filters }: Props) {
     const handleDateChange = (value: any) => {
         const from = moment(new Date(value[0].$d)).format('YYYY-MM-DD')
         const to = moment(new Date(value[1].$d)).format('YYYY-MM-DD')
-        setFilters({
-            ...filters,
-            more: { ...filters.more, openHouse: from + ' to ' + to },
-        })
+        // setFilters({
+        //     ...filters,
+        //     more: { ...filters.more, openHouse: from + ' to ' + to },
+        // })
     }
     return (
         <div className=" flex flex-col">
-            <div className="flex flex-wrap">
+            {/* <div className="flex flex-wrap">
                 {radios.map((item) => (
                     <p
                         className={classNames(
@@ -41,7 +41,7 @@ export default function OpenHouse({ setFilters, filters }: Props) {
                         {item}
                     </p>
                 ))}
-            </div>
+            </div> */}
             <div className=" my-2">
                 <p className=" my-2">Select Date Range</p>
                 <RangePicker onChange={(e) => handleDateChange(e)} />

@@ -15,6 +15,7 @@ interface AiChatProps {
     chat: any
     setSearch: React.Dispatch<React.SetStateAction<string>>
     search: string
+    setSelectedListings: React.Dispatch<React.SetStateAction<any[]>>
 }
 export default function AiChat({
     setIsAiChat,
@@ -27,6 +28,7 @@ export default function AiChat({
     chat,
     setSearch,
     search,
+    setSelectedListings
 }: AiChatProps) {
     const handleChat = () => {
         setAIData([])
@@ -54,6 +56,7 @@ export default function AiChat({
                         setOpenChatAi(undefined)
                         setIsOpenPropertyFilter(false)
                         setIsOpenPriceFilter(false)
+                        setSelectedListings([])
                     }}
                     className=" cursor-pointer"
                 />

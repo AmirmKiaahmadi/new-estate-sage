@@ -1,22 +1,22 @@
 import { IFilters } from 'components/leaflet'
 
 export const initialFilters: IFilters = {
-    properties: [],
-    price: [0, 4000000],
-    active: 'All date listing',
-    conditions: '',
-    leaseAndSale: 'for lease',
+    properties: [], //done
+    price: [0, 4000000], //done
+    active: 'All date listing', //check
+    conditions: '', //check
+    leaseAndSale: '', //done
     more: {
-        keywords: [],
-        fee: [],
-        bedrooms: 'All',
-        bathrooms: 'All',
-        kitchen: 'All',
-        garage: 'All',
-        parkingType: [],
-        basement: [],
-        openHouse: '',
-        listingType: [],
-        squareFootage: [0, 400000],
+        keywords: [], //check
+        fee: [], //one
+        bedrooms: '', // done
+        bathrooms: '', // done
+        kitchen: '', // done
+        garage: '', // done
+        parkingType: [], // done
+        basement: [], //done
+        openHouse: [], // fix
+        listingType: [], // fix
+        squareFootage: [0, 400000], //done
     },
 }
