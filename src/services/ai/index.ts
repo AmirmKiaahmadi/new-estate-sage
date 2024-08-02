@@ -36,20 +36,12 @@ export const aiServiceFeatures = async (payload1: any) => {
 // https://cdn.repliers.io/IMG-C8391984_1.jpg?class=small
 
 export const DetailService = async (ctx: QueryFunctionContext) => {
-    const payload = JSON.stringify([
-        {
-            mlsNumber: ctx.queryKey[1],
-            latitude: ctx.queryKey[2],
-            longitude: ctx.queryKey[3],
-        },
-    ])
-    const { data }: { data: any } = await request.post(
-        `http://ec2-3-96-165-111.ca-central-1.compute.amazonaws.com:8000/app/id_search/`,
-        {
-            data: payload,
-        }
+   
+    const { data }: { data: any } = await request.get(
+        `https://api.repliers.io/listings/${ctx.queryKey[1]}`,
+       
     )
-    return data.data[0]
+    return data
 }
 
 export const listingsService = async () => {

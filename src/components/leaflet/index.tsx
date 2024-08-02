@@ -32,6 +32,7 @@ import {
     Bed,
     BookmarkSimple,
     Car,
+    CaretLeft,
     MapPin,
     ShareNetwork,
     Stack,
@@ -55,6 +56,7 @@ import SelectedListings from './selectedListings'
 import useGetPlaces from './hooks/useGetPlaces'
 import LoadingBar from 'react-top-loading-bar'
 import useSetListingPropertyType from './hooks/useSetListingPropertyType'
+import WatchedArea from './filters/whatchedArea'
 
 export interface IFilters {
     properties: string[]
@@ -93,7 +95,8 @@ const Map = () => {
     const [isOpenActiveFilter, setIsOpenActiveFilter] = useState<boolean>(false)
     const [isOpenMoreFilters, setIsOpenMoreFilters] = useState<boolean>(false)
     const [AIData, setAIData] = useState<any>([])
-    const [center , setCenter] = useState<[number , number]>([43.65107, -79.347015])
+    const [center , setCenter] = useState<[number , number]>([1,2])
+    const [isOpenWatchedArea , setIsOpenWhatchedArea] = useState<boolean>(false)
 
     const [selectedMarker, setSelectedMarker] = useState<any | undefined>()
 
@@ -113,6 +116,7 @@ const Map = () => {
 
     const { isLoadingListings} = useGetListings(setListingMarkers , setListings)
     const [selectedListings , setSelectedListings] = useState<any[]>([])
+    const [isOpenSummeryModal , setIsOpenSummeryModal] = useState(false)
 
 
     const { mutateDetail } = useGetDiscriptions(setRealData)
@@ -169,6 +173,7 @@ const Map = () => {
 
 
 
+console.log("selectedMarker" , selectedMarker)
 
     return (
         <>
@@ -202,6 +207,7 @@ const Map = () => {
                             setSearch={setSearch}
                             search={search}
                             setSelectedListings = {setSelectedListings}
+                            setIsOpenWhatchedArea = {setIsOpenWhatchedArea}
                         />
                     </div>
                 )}
@@ -243,18 +249,44 @@ const Map = () => {
                     </div>
                 )}
                 {isOpenMoreFilters && (
-                    <div className=" h-full w-[25%]  p-2 relative shadow-[21px 7px 35px -3px rgba(0,0,0,0.48)] border-l border-[#CCCBC8] overflow-y-scroll ">
+                    <div className=" w-[25%]  p-2 relative shadow-[21px 7px 35px -3px rgba(0,0,0,0.48)] border-l border-[#CCCBC8]">
+                        <div className='  overflow-y-scroll h-full'>
                         <MoreFilters
                             setFilters={setFilters}
                             filters={filters}
                             setIsOpenActiveFilter={setIsOpenMoreFilters}
                         />
-                    </div>
+                        </div>
+                       
+                        <div className=' absolute right-3 top-3 z-10000 rounded-full cursor-pointer shadow-[0_3px_10px_rgb(0,0,0,0.2)] bg-white text-[#595653]'
+                   onClick = {() => setIsOpenMoreFilters(false) }
+                   ><CaretLeft size={26} /></div>
+                     </div>
+                  
                 )}
                 {selectedListings && selectedListings.length > 0 && (
-                    <div className=" h-full w-[25%]  p-2 relative shadow-[21px 7px 35px -3px rgba(0,0,0,0.48)] border-l border-[#CCCBC8] overflow-y-scroll ">
-                    <SelectedListings data={selectedListings} />
-                </div>
+                    <div className=" relative  w-[25%]  p-2 shadow-[21px 7px 35px -3px rgba(0,0,0,0.48)] border-l border-[#CCCBC8] ">
+                        <div className='  overflow-y-scroll h-full'>
+                        <SelectedListings data={selectedListings} setIsOpenSummeryModal = {setIsOpenSummeryModal} setSelectedMarker = {setSelectedMarker} />
+                        </div>
+                    
+                   <div className=' absolute right-3 top-3 z-10000 rounded-full cursor-pointer shadow-[0_3px_10px_rgb(0,0,0,0.2)] bg-white text-[#595653]'
+                   onClick = {() => setSelectedListings([]) }> 
+                       <CaretLeft size={26} />
+                   </div>
+                     </div>
+                )}
+                {isOpenWatchedArea && (
+                    <div className=" relative  w-[25%]  p-2 shadow-[21px 7px 35px -3px rgba(0,0,0,0.48)] border-l border-[#CCCBC8] ">
+                        <div className='  overflow-y-scroll h-full'>
+                       <WatchedArea setIsOpenSummeryModal = {setIsOpenSummeryModal} setSelectedMarker = {setSelectedMarker} />
+                        </div>
+                    
+                   <div className=' absolute right-3 top-3 z-10000 rounded-full cursor-pointer shadow-[0_3px_10px_rgb(0,0,0,0.2)] bg-white text-[#595653]'
+                   onClick = {() => setIsOpenWhatchedArea(false) }> 
+                       <CaretLeft size={26} />
+                   </div>
+                     </div>
                 )}
                 <MapContainer
                     key={center.toString()} 
@@ -270,6 +302,7 @@ const Map = () => {
                     zoomControl={false}
                     
                 >
+                    
                     <TileLayer
                     
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -279,6 +312,7 @@ const Map = () => {
                                 : 'http://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}'
                         }
                     />
+                   
                     <FeatureGroup>
                         <EditControl
                             position="topright"
@@ -344,7 +378,7 @@ const Map = () => {
                                     }}
                                     icon={divIcon({
                                         className: 'custom-icon',
-                                        html: `<div style="background-color: white; color:#4B8179;  text-align: center; padding: 5px;border-radius:10% / 25%;border : 2px solid #4B8179">$ ${ Math.floor(Number(listings?.listings.find((item:any) => 
+                                        html: `<div style="background-color: white; color:#4B8179;  text-align: center; padding: 1px;border-radius:10% / 25%;border : 2px solid #4B8179">$ ${ Math.floor(Number(listings?.listings.find((item:any) => 
                                             Number(item.map.latitude) === address[0] && 
                                             Number(item.map.longitude) === address[1]
                                             )?.originalPrice)).toLocaleString() || "N/A" }</div>`,
@@ -370,17 +404,21 @@ const Map = () => {
                                                             padding: '15px',
                                                         }}
                                                     >
-                                                        <a
+                                                        {/* <a
                                                             target="_blank"
                                                             href={`${window.location.pathname}/detail/${selectedMarker?.images[0]}/${selectedMarker.map.latitude}/${selectedMarker.map.longitude}`}
                                                             className=" rounded-lg cursor-pointer"
                                                            
-                                                        >
-                                                            <div className='grid grid-cols-3 gap-2'>
+                                                        > */}
+                                                            <div className='grid grid-cols-3 gap-2' onClick = {() => setIsOpenSummeryModal(true)}>
                                                             <img
-                                                                src={`https://cdn.repliers.io/IMG-${selectedMarker?.images[0]}?class=small`}
+                                                                src={`https://cdn.repliers.io/${selectedMarker?.images[0]}?class=small`}
                                                                 alt="example"
                                                                 className=" col-span-1"
+                                                                style={{
+                                                                    height : "100%",
+                                                                    borderRadius : "10px"
+                                                                }}
                                                             />
                                                             <div className=' col-span-2'>
 
@@ -426,17 +464,7 @@ const Map = () => {
                                                                     </p>
                                                                 </div>
                                                                 <div className=" flex justify-between">
-                                                                    <div className="flex text-xs">
-                                                                        <Bathtub
-                                                                            size={
-                                                                                18
-                                                                            }
-                                                                            className=" text-[#595653]"
-                                                                        />
-                                                                        <span className=" mx-1 text-[#595653]">
-                                                                            2
-                                                                        </span>
-                                                                    </div>
+                                                                    
                                                                     <div className="flex text-xs">
                                                                         <Bed
                                                                             size={
@@ -448,6 +476,17 @@ const Map = () => {
                                                                             {
                                                                                 selectedMarker.numRooms
                                                                             }
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="flex text-xs">
+                                                                        <Bathtub
+                                                                            size={
+                                                                                18
+                                                                            }
+                                                                            className=" text-[#595653]"
+                                                                        />
+                                                                        <span className=" mx-1 text-[#595653]">
+                                                                            2
                                                                         </span>
                                                                     </div>
                                                                     <div className="flex text-xs">
@@ -471,7 +510,7 @@ const Map = () => {
                                                             </div>
                                                             
                                                            
-                                                        </a>
+                                                        {/* </a> */}
                                                     </Card>
                                                 </div>
                                             </Popup>
@@ -558,33 +597,45 @@ const Map = () => {
                                                             padding: '15px',
                                                         }}
                                                     >
-                                                        <a
+                                                        {/* <a
                                                             target="_blank"
                                                             href={`${window.location.pathname}/detail/${selectedMarker?.images[0]}/${selectedMarker.map.latitude}/${selectedMarker.map.longitude}`}
                                                             className=" rounded-lg cursor-pointer"
                                                            
-                                                        >
-                                                            <div className='grid grid-cols-3 gap-2'>
+                                                        > */}
+                                                            <div className='grid grid-cols-3 gap-2 relative' onClick = {() => setIsOpenSummeryModal(true)}>
                                                             <img
-                                                                src={`https://cdn.repliers.io/IMG-${selectedMarker?.images[0]}?class=small`}
+                                                                src={`https://cdn.repliers.io/${selectedMarker?.images[0]}?class=small`}
                                                                 alt="example"
                                                                 className=" col-span-1"
+                                                                style={{
+                                                                    height : "100%",
+                                                                    borderRadius : "10px"
+                                                                }}
                                                             />
+                                                             <p className=" bg-[#E5F0A6] rounded-xl py-0.5 px-3 text-xs opacity-75 mr-1 text-[#7C951B] absolute top-0 left-1">
+                                                                        {
+                                                                            `${selectedMarker.type} - ${selectedMarker.details.propertyType}`
+                                                                        }
+                                                                        
+                                                                    </p>
                                                             <div className=' col-span-2'>
 
-                                                            <div className="flex justify-between text-sm items-center my-2">
+                                                            <div className="flex justify-between text-sm items-center  -mt-2">
                                                               
-                                                                    <p className=" bg-[#E5F0A6] rounded-xl py-1 px-2 mr-1 text-[#7C951B]">
-                                                                        {
-                                                                            selectedMarker.type
-                                                                        }
-                                                                    </p>
+                                                                   
                                                                     <p className=" mx-1 text-[#7F7C77]">
                                                                         {moment(new Date(selectedMarker.listDate)).format('YYYY-MM-DD')}
+                                                                    </p>
+
+                                                                    <p className=" mx-1 text-[#7F7C77]">
+                                                                        {selectedMarker.mlsNumber}
                                                                     </p>
                                                               
                                                                 
                                                             </div>
+                                                            
+                                                           
                                                             <div className=" my-1 flex text-xs">
                                                                 <MapPin
                                                                     size={18}
@@ -593,15 +644,15 @@ const Map = () => {
                                                                 <span className=" text-[#273A38]">
                                                                     {selectedMarker
                                                                         .address
-                                                                        .city +
-                                                                        ',' +
+                                                                        .streetNumber +
+                                                                        ' ' +
                                                                         selectedMarker
                                                                             .address
-                                                                            .district +
-                                                                        ',' +
+                                                                            .streetName +
+                                                                        ' ' +
                                                                         selectedMarker
                                                                             .address
-                                                                            .majorIntersection}
+                                                                            .streetSuffix + ", " + selectedMarker.address.city}
                                                                 </span>
                                                             </div>
                                                             <div className=" flex justify-between text-sm items-center">
@@ -614,18 +665,7 @@ const Map = () => {
                                                                     </p>
                                                                 </div>
                                                                 <div className=" flex justify-between">
-                                                                    <div className="flex text-xs">
-                                                                        <Bathtub
-                                                                            size={
-                                                                                18
-                                                                            }
-                                                                            className=" text-[#595653]"
-                                                                        />
-                                                                        <span className=" mx-1 text-[#595653]">
-                                                                            2
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="flex text-xs">
+                                                                <div className="flex text-xs mx-2">
                                                                         <Bed
                                                                             size={
                                                                                 18
@@ -634,11 +674,28 @@ const Map = () => {
                                                                         />
                                                                         <span className=" mx-1 text-[#595653]">
                                                                             {
-                                                                                selectedMarker.numRooms
+                                                                                selectedMarker.details.numBedrooms
+                                                                            }
+                                                                            {
+                                                                                selectedMarker.details.numbBedroomsPlus && ` + ${selectedMarker.details.numbBedroomsPlus}`
                                                                             }
                                                                         </span>
                                                                     </div>
-                                                                    <div className="flex text-xs">
+                                                                    <div className="flex text-xs mx-2">
+                                                                        <Bathtub
+                                                                            size={
+                                                                                18
+                                                                            }
+                                                                            className=" text-[#595653]"
+                                                                        />
+                                                                        <span className=" mx-1 text-[#595653]">
+                                                                        {
+                                                                                selectedMarker.details.numBathrooms
+                                                                            }
+                                                                        </span>
+                                                                    </div>
+                                                                    
+                                                                    <div className="flex text-xs mx-2">
                                                                         <Car
                                                                             size={
                                                                                 18
@@ -646,7 +703,7 @@ const Map = () => {
                                                                             className=" text-[#595653]"
                                                                         />
                                                                         <span className=" mx-1 text-[#595653]">
-                                                                            2
+                                                                            {Number(selectedMarker.details.numGarageSpaces)}
                                                                         </span>
                                                                     </div>
                                                                 </div>
@@ -659,7 +716,7 @@ const Map = () => {
                                                             </div>
                                                             
                                                            
-                                                        </a>
+                                                        {/* </a> */}
                                                     </Card>
                                                 </div>
                                             </Popup>
@@ -680,10 +737,12 @@ const Map = () => {
                     
                 </MapContainer>
             </div>
-            {/* <DetailModal
-                open={openDetail}
-                onHide={() => setOpenDetail(false)}
-            /> */}
+            <DetailModal
+                open={isOpenSummeryModal && selectedMarker}
+                onHide={() => setIsOpenSummeryModal(false)}
+                data = {selectedMarker}
+                
+            />
         </>
     )
 }

@@ -15,43 +15,30 @@ import {
     Oven,
 } from '@phosphor-icons/react'
 import moment from 'moment'
+import { PhotoProvider, PhotoView } from 'react-photo-view'
+import classNames from 'classnames'
 
 interface IPropsP {
     data: any
 }
 export default function DetailsTab({ data }: IPropsP) {
-    const [images, setImages] = useState<string[]>([])
-    const [area, setArea] = useState()
-    const [bathrooms, setBathrooms] = useState()
-    const [tax, setTax] = useState()
-    const [rooms, setRooms] = useState()
-    useEffect(() => {
-        if (data) {
-            setImages(JSON.parse(data.images))
-            setArea(JSON.parse(data.lot))
-            setBathrooms(JSON.parse(data.numBathrooms))
-            setTax(JSON.parse(data.taxes))
-            setRooms(JSON.parse(data.rooms))
-        }
-    }, [data])
-    console.log('data', data)
     return (
         <div className=" overflow-x-hidden">
-            <div className=" grid grid-cols-5 gap-2 h-[600px] w-full overflow-x-hidden ">
-                <div className="col-span-4 h-[500px]">
+           <div className=" grid grid-cols-8 gap-2 h-[300px] w-full overflow-x-hidden ">
+                <div className="col-span-4 h-[300px]">
                     <div className=" relative ">
                         <img
-                            src={`https://cdn.repliers.io/${images[0]}?class=large`}
+                            src={`https://cdn.repliers.io/${data.images[0]}?class=large`}
                             alt="house"
-                            className=" rounded-lg w-full h-[600px] "
+                            className=" rounded-lg w-full h-[300px] "
                         />
                         <span className=" bg-[#F4F9F8] absolute top-5 left-5 text-[#4B8179] px-2 py-1 rounded-xl border border-[#DCEBE7]">
                             For {data.type}
                         </span>
                     </div>
                 </div>
-                <div className=" col-span-1  h-[600px] flex flex-col overflow-x-hidden">
-                    {images.slice(1, 5).map((item) => (
+                <div className=" col-span-2  h-[300px] flex flex-col overflow-x-hidden">
+                    {data.images.slice(1, 3).map((item : any) => (
                         <img
                             src={`https://cdn.repliers.io/${item}?class=small`}
                             alt="house"
@@ -59,7 +46,29 @@ export default function DetailsTab({ data }: IPropsP) {
                         />
                     ))}
                 </div>
-            </div>
+                <div className=" col-span-2  h-[300px] flex flex-col overflow-x-hidden">
+                    {data.images.slice(4, 5).map((item : any) => (
+                        <img
+                            src={`https://cdn.repliers.io/${item}?class=small`}
+                            alt="house"
+                            className=" rounded-lg   grow h-[120px] my-1   "
+                        />
+                    ))}
+                     <PhotoProvider>
+                   {data.images.map((item: any , index : number) => (              
+                        <PhotoView key={index}  src={`https://cdn.repliers.io/${item}?class=large`}>
+                         
+                          <img
+                                src={`https://cdn.repliers.io/${item}?class=small`}
+                                alt="house"
+                                className={classNames(index === 6 ? " rounded-lg   grow h-[120px] my-1 opacity-25 hover:opacity-100 cursor-pointer  " : " hidden")}
+                            />
+                            
+                        </PhotoView>     
+                   ))}
+                    </PhotoProvider>
+                </div>
+            </div>  
             <Row className=" mt-8">
                 <Col span={18} className="z-10">
                     <div id="Overview" className="">
@@ -121,8 +130,8 @@ export default function DetailsTab({ data }: IPropsP) {
                                     {data.numBedrooms}
                                 </div>
                                 <div className=" w-full text-center py-3">
-                                    {/* @ts-ignore */}
-                                    {area && area?.depth} - {area && area.width}
+                                    
+                                    {data.lot.depth} - {data.lot.width}
                                 </div>
                             </div>
                             <div className=" flex justify-between border-b border-[#DCEBE7] ">
@@ -148,10 +157,8 @@ export default function DetailsTab({ data }: IPropsP) {
                                     {data.numBathrooms}
                                 </div>
                                 <div className=" w-full text-center py-3">
-                                    {/* @ts-ignore */}
-                                    {bathrooms && bathrooms.depth} -{' '}
-                                    {/* @ts-ignore */}
-                                    {bathrooms && bathrooms.width}
+                                    {data.numBathrooms?.depth} -{' '}
+                                    {data.numBathrooms?.width}
                                 </div>
                             </div>
                             <div className=" flex justify-between border-b border-[#DCEBE7] ">
@@ -184,15 +191,14 @@ export default function DetailsTab({ data }: IPropsP) {
                                     Tax
                                 </div>
                                 <div className=" border-r border-l border-[#DCEBE7] w-full text-center  py-3">
-                                    {/* @ts-ignore */}$
-                                    {tax && tax?.annualAmount}
+                                    $
+                                    {data.taxes?.annualAmount}
                                 </div>
                                 <div className=" w-full text-center py-3 bg-[#FAFCE9]">
                                     Building Age
                                 </div>
                                 <div className=" border-r border-l border-[#DCEBE7] w-full text-center  py-3">
-                                    {/* @ts-ignore */}
-                                    {tax && tax.assessmentYear}
+                                    {data?.taxes.assessmentYear}
                                 </div>
                             </div>
                             <div className=" flex justify-between border-b border-[#DCEBE7] ">
@@ -411,7 +417,7 @@ export default function DetailsTab({ data }: IPropsP) {
                                     Features
                                 </div>
                                 <div className=" border-r border-l border-[#DCEBE7] w-full text-center  py-3">
-                                    {/* @ts-ignore */}-
+                                    -
                                 </div>
                                 <div className=" w-full text-center py-3 bg-[#FAFCE9]"></div>
                                 <div className=" border-r border-l border-[#DCEBE7] w-full text-center  py-3"></div>
@@ -525,3 +531,4 @@ export default function DetailsTab({ data }: IPropsP) {
         </div>
     )
 }
+

@@ -9,7 +9,7 @@ import { ToastContainer, Zoom } from 'react-toastify'
 import * as serviceWorkerRegistration from './serviceWorkerRegistration'
 import 'react-chat-elements/dist/main.css'
 import { QueryClient, QueryClientProvider } from 'react-query'
-
+import 'react-photo-view/dist/react-photo-view.css';
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 const queryClient = new QueryClient({
     defaultOptions: {

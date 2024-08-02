@@ -6,6 +6,7 @@ import L from 'leaflet'
 type TLocationMapProps = {
     center?: any
     selectLocation: React.Dispatch<React.SetStateAction<any | undefined>>
+    height? : string
 }
 
 const iconPerson = new L.Icon({
@@ -35,7 +36,7 @@ function LocationMarker({ selectLocation, center }: TLocationMapProps) {
     )
 }
 
-const LocationMap = ({ center, selectLocation }: TLocationMapProps) => {
+const LocationMap = ({ center, selectLocation , height }: TLocationMapProps) => {
     return (
         <>
             <MapContainer
@@ -46,7 +47,7 @@ const LocationMap = ({ center, selectLocation }: TLocationMapProps) => {
                 id={'map'}
                 zoom={16}
                 center={center}
-                style={{ width: '100%', height: '400px', borderRadius: '10px' }}
+                style={{ width: '100%', height: height ? height :  '400px', borderRadius: '10px' }}
                 easeLinearity={0.35}
             >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />

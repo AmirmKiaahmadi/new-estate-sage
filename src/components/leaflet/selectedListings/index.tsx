@@ -3,13 +3,18 @@ import moment from 'moment'
 import React from 'react'
 interface IProps{
     data : any[]
+    setIsOpenSummeryModal : React.Dispatch<React.SetStateAction<boolean>>
+    setSelectedMarker: React.Dispatch<any>
 }
-export default function SelectedListings({data} :IProps) {
+export default function SelectedListings({data , setIsOpenSummeryModal , setSelectedMarker} :IProps) {
     
   return (
     <>
       {data.map(item => (
-        <div className=" p-1 rounded-lg border border-[#CCCBC8] cursor-pointer my-2">
+        <div className=" p-1 rounded-lg border border-[#CCCBC8] cursor-pointer my-2"  onClick={() => {
+            setSelectedMarker(item)
+            setIsOpenSummeryModal(true)
+        }}>
                         <img
                             src={`https://cdn.repliers.io/IMG-${item.mlsNumber}_1.jpg?class=small`}
                             alt="example"

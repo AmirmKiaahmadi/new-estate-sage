@@ -29,6 +29,7 @@ interface IFiltersProps {
     setSearch: React.Dispatch<React.SetStateAction<string>>
     search: string
     setSelectedListings: React.Dispatch<React.SetStateAction<any[]>>
+    setIsOpenWhatchedArea : React.Dispatch<React.SetStateAction<boolean>>
 }
 export default function Filters({
     setOpenChatAi,
@@ -46,7 +47,8 @@ export default function Filters({
     chat,
     setSearch,
     search,
-    setSelectedListings
+    setSelectedListings,
+    setIsOpenWhatchedArea
 }: IFiltersProps) {
     const [isAIChat, setIsAiChat] = useState<boolean>(false)
 
@@ -73,7 +75,7 @@ export default function Filters({
                             <div
                                 className={classNames(
                                     ' py-2 w-full mx-1 rounded-lg text-center cursor-pointer',
-                                    filters.leaseAndSale === 'for sale'
+                                    filters.leaseAndSale === 'sale'
                                         ? 'bg-[#E5F0A6] text-[#7C951B]'
                                         : 'bg-[#FAFCE9] text-[#7C951B]'
                                 )}
@@ -89,7 +91,7 @@ export default function Filters({
                             <div
                                 className={classNames(
                                     ' py-2 w-full mx-1 rounded-lg text-center cursor-pointer',
-                                    filters.leaseAndSale === 'for lease'
+                                    filters.leaseAndSale === 'lease'
                                         ? 'bg-[#E5F0A6] text-[#7C951B]'
                                         : 'bg-[#FAFCE9] text-[#7C951B]'
                                 )}
@@ -246,7 +248,7 @@ export default function Filters({
                             <DotsThreeOutline size={20} />
                             <span className=" text-sm mx-2">More Detail</span>
                         </div>
-                        <div className=" flex text-[#595653] cursor-pointer my-4">
+                        <div className=" flex text-[#595653] cursor-pointer my-4" onClick={() => setIsOpenWhatchedArea(true)}>
                             <MapPinArea size={20} />
                             <span className=" text-sm mx-2">Watched Area</span>
                         </div>

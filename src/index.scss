@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 @import 'react-toastify/dist/ReactToastify.css';
+@import "~react-image-gallery/styles/scss/image-gallery.scss";
 .leaflet-touch .leaflet-control-layers, .leaflet-touch .leaflet-bar{
     border: none !important;
 }

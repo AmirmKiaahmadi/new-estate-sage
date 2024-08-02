@@ -40,8 +40,8 @@ export default function AccessTab({ data }: IKProps) {
                         <div className=" mr-6">
                             <LocationMap
                                 center={{
-                                    lat: Number(data.latitude),
-                                    lng: Number(data.longitude),
+                                    lat: Number(data.map.latitude),
+                                    lng: Number(data.map.longitude),
                                 }}
                                 selectLocation={setLocation}
                             />
