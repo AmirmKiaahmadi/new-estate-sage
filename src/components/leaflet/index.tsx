@@ -84,6 +84,7 @@ export interface IFilters {
 }
 
 const Map = () => {
+    const [allMarkers, setAllMarkers] = useState<any[]>([]);
     const [isVisible, setIsVisible] = useState<boolean>(false)
     const [isOpenSidebar, setIsOpenSidebar] = useState<boolean>(true)
     const [openDetail, setOpenDetail] = useState<boolean>(false)
@@ -99,7 +100,7 @@ const Map = () => {
     const [isOpenActiveFilter, setIsOpenActiveFilter] = useState<boolean>(false)
     const [isOpenMoreFilters, setIsOpenMoreFilters] = useState<boolean>(false)
     const [AIData, setAIData] = useState<any>([])
-    const [center , setCenter] = useState<[number , number]>([1,2])
+    const [center , setCenter] = useState<[number , number]>([43.65107, -79.347015])
     const [isOpenWatchedArea , setIsOpenWhatchedArea] = useState<boolean>(false)
 
     const [selectedMarker, setSelectedMarker] = useState<any | undefined>()
@@ -146,7 +147,7 @@ const Map = () => {
     const [isDraw , setIsDraw] = useState(false)
     const searchMlsNumber = useSelector((state : RootState)  => state.sideBarControler.mlsNumber)
 
-    const { isLoadingListings} = useGetListings(setListingMarkers , setListings , listings , currentViewPolygon , isDraw , searchMlsNumber)
+    const { isLoadingListings} = useGetListings(setListingMarkers , setListings , listings , currentViewPolygon , isDraw , searchMlsNumber , setAllMarkers)
     const [selectedListings , setSelectedListings] = useState<any[]>([])
     const [isOpenSummeryModal , setIsOpenSummeryModal] = useState(false)
   
@@ -197,7 +198,7 @@ const Map = () => {
     };
 
     useEffect(() => {
-        if(listingMarkers && !isDraw && !searchMlsNumber){
+        if(listingMarkers && !isDraw && !searchMlsNumber && openChatAi ){
             const newCenter= calculateCenter(listingMarkers)
             //@ts-ignore
             setCenter(newCenter)
@@ -378,7 +379,7 @@ console.log("selectedMarker" , selectedMarker)
                 <MapContainer
                     key={center.toString()} 
                     center={center}
-                    zoom={12}
+                    zoom={6}
                     scrollWheelZoom={true}
                     style={{
                         height: '100%',
@@ -444,7 +445,7 @@ console.log("selectedMarker" , selectedMarker)
                     {listingMarkers.length > 0 && (
                         <MarkerClusterGroup
                         
-                            chunkedLoading
+                            
                             showCoverageOnHover={false}
                             onClick={(e: any) => {
                                 
@@ -468,11 +469,11 @@ console.log("selectedMarker" , selectedMarker)
                                 }
                             }}
                         >
-                            {listingMarkers &&
-                                listingMarkers.map((address: any, index: any) => (
+                            {allMarkers &&
+                                allMarkers.map((address: any, index: any) => (
                                     <Marker
                                     key={index}
-                                    position={[address[0], address[1]]}
+                                    position={[address.map.latitude, address.map.longitude]}
                                     eventHandlers={{
                                         click: (e) => {
                                             setSelectedListings([]);
