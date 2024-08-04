@@ -6,6 +6,7 @@ import {
     Popup,
     TileLayer,
     ZoomControl,
+    useMap,
 } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import { addressPoints } from './utils'
@@ -57,6 +58,9 @@ import useGetPlaces from './hooks/useGetPlaces'
 import LoadingBar from 'react-top-loading-bar'
 import useSetListingPropertyType from './hooks/useSetListingPropertyType'
 import WatchedArea from './filters/whatchedArea'
+import { formatPrice } from 'utilities/helper/formatPrice'
+import { useSelector } from 'react-redux'
+import { RootState } from 'store'
 
 export interface IFilters {
     properties: string[]
@@ -99,6 +103,7 @@ const Map = () => {
     const [isOpenWatchedArea , setIsOpenWhatchedArea] = useState<boolean>(false)
 
     const [selectedMarker, setSelectedMarker] = useState<any | undefined>()
+    
 
     const legalIcon = new Icon({
         iconUrl: LocationIcon,
@@ -110,13 +115,41 @@ const Map = () => {
     const [chat, setChat] = useState<any>([])
     const [search, setSearch] = useState<string>('')
     const [realData, setRealData] = useState<any[]>([])
-    const {places} = useGetPlaces()
+    const [drawnPolygons, setDrawnPolygons] = useState([]);
+    const [currentViewPolygon, setCurrentViewPolygon] = useState<any>([
+        [
+            [
+                -79.44591700119429,
+                43.57069055225934
+            ],
+            [
+                -79.25743280929976,
+                43.57069055225934
+            ],
+            [
+                -79.25743280929976,
+                43.736623487867654
+            ],
+            [
+                -79.44591700119429,
+                43.736623487867654
+            ],
+            [
+                -79.44591700119429,
+                43.57069055225934
+            ]
+        ]
+    ]);
+    // const {places} = useGetPlaces()
     const [listingMarkers , setListingMarkers] = useState<any[]>([])
     const [listings , setListings] = useState<any>()
+    const [isDraw , setIsDraw] = useState(false)
+    const searchMlsNumber = useSelector((state : RootState)  => state.sideBarControler.mlsNumber)
 
-    const { isLoadingListings} = useGetListings(setListingMarkers , setListings)
+    const { isLoadingListings} = useGetListings(setListingMarkers , setListings , listings , currentViewPolygon , isDraw , searchMlsNumber)
     const [selectedListings , setSelectedListings] = useState<any[]>([])
     const [isOpenSummeryModal , setIsOpenSummeryModal] = useState(false)
+  
 
 
     const { mutateDetail } = useGetDiscriptions(setRealData)
@@ -136,12 +169,12 @@ const Map = () => {
     const navigate = useNavigate()
 
 
-    useEffect(() => {
-        mutatePropertyType(filters)
-    }, [filters])
+    // useEffect(() => {
+    //     mutatePropertyType(filters)
+    // }, [filters])
 
     const handleFindMarkerDetail = (value: any) => {
-        const findMarkerDetail = listings?.listings.find(
+        const findMarkerDetail = listings?.find(
             (item: any) =>
                 Number(item.map.latitude) === Number(value.lat) &&
                 Number(item.map.longitude) === Number(value.lng)
@@ -164,12 +197,66 @@ const Map = () => {
     };
 
     useEffect(() => {
-        if(listingMarkers){
+        if(listingMarkers && !isDraw && !searchMlsNumber){
             const newCenter= calculateCenter(listingMarkers)
             //@ts-ignore
             setCenter(newCenter)
         }
     } , [listingMarkers])
+    
+
+    const MapEvents = () => {
+        const map = useMap();
+
+        useEffect(() => {
+            if(!isDraw && !searchMlsNumber){
+                const handleViewChange = (e: any) => {
+                    const bounds = map.getBounds();
+                    const southwest = bounds.getSouthWest();
+                    const northeast = bounds.getNorthEast();
+                    
+    
+                    const polygon = [
+                        [
+                            [ southwest.lng , southwest.lat],
+                            [ northeast.lng , southwest.lat],
+                            [ northeast.lng , northeast.lat],
+                            [ southwest.lng , northeast.lat],
+                        [ southwest.lng , southwest.lat], // Closing the polygon
+                    ],
+                    ];
+    
+                    setCurrentViewPolygon(polygon);
+                };
+    
+                map.on('moveend', handleViewChange);
+                return () => {
+                    map.off('moveend', handleViewChange);
+                };
+            }
+           
+
+            // Cleanup listener on component unmount
+            
+        }, [map]); // Run effect when map instance changes
+
+        return null;
+    };
+
+    const handlePolygonCreated = (e: any) => {
+        const coords = e.layer.getLatLngs();
+        
+        const newpol: any[] = coords[0].map((item: any) => [item.lng, item.lat]);
+        //@ts-ignore
+        setDrawnPolygons((prevDrawnPolygons) => {
+            // Combine the previous state with the new polygon
+            const updatedPolygons = prevDrawnPolygons.length > 0 ? [...prevDrawnPolygons, newpol] : [newpol];
+            setCurrentViewPolygon(updatedPolygons);
+            return updatedPolygons; // Return the updated state
+        });
+    };
+
+   
 
 
 
@@ -291,7 +378,7 @@ console.log("selectedMarker" , selectedMarker)
                 <MapContainer
                     key={center.toString()} 
                     center={center}
-                    zoom={7}
+                    zoom={12}
                     scrollWheelZoom={true}
                     style={{
                         height: '100%',
@@ -323,9 +410,25 @@ console.log("selectedMarker" , selectedMarker)
                                 marker: false,
                                 circlemarker: false,
                             }}
+                            onCreated={handlePolygonCreated} // Handle the polygon creation
+                            onDrawStart={() => setIsDraw(true)} // Draw started
+                            onDeleted={() => {
+                               
+                                setIsDraw(false)
+                                setDrawnPolygons([])
+                            }}
+                            onDeleteStart={() => {
+                                setCenter([43.65107, -79.347015])
+                                setIsDraw(false)
+                                setDrawnPolygons([])
+                            }}
+                           
+                            
+                            
                         />
                     </FeatureGroup>
                     <ZoomControl position="bottomright" />
+                    <MapEvents />
                     <Control prepend position="bottomright">
                         <div
                             className="  bg-white rounded-full p-2.5  shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] cursor-pointer -mb-2"
@@ -351,7 +454,7 @@ console.log("selectedMarker" , selectedMarker)
                                     e.layer
                                         .getAllChildMarkers()
                                         .map((item: any) => {
-                                            const findListings = listings.listings.find((item2 : any) => Number(item2.map.latitude) === Number( item._latlng.lat) && Number(item2.map.longitude) === item._latlng.lng )
+                                            const findListings = listings?.find((item2 : any) => Number(item2.map.latitude) === Number( item._latlng.lat) && Number(item2.map.longitude) === item._latlng.lng )
                                            if(findListings){
                                             newChildrens.push(findListings)
                                            }
@@ -378,7 +481,7 @@ console.log("selectedMarker" , selectedMarker)
                                     }}
                                     icon={divIcon({
                                         className: 'custom-icon',
-                                        html: `<div style="background-color: white; color:#4B8179;  text-align: center; padding: 1px;border-radius:10% / 25%;border : 2px solid #4B8179">$ ${ Math.floor(Number(listings?.listings.find((item:any) => 
+                                        html: `<div style="background-color: white; color:#4B8179;  text-align: center; padding: 1px;border-radius:10% / 25%;border : 2px solid #4B8179">$ ${ Math.floor(Number(listings?.find((item:any) => 
                                             Number(item.map.latitude) === address[0] && 
                                             Number(item.map.longitude) === address[1]
                                             )?.originalPrice)).toLocaleString() || "N/A" }</div>`,
@@ -441,17 +544,17 @@ console.log("selectedMarker" , selectedMarker)
                                                                     className=" text-[#595653]"
                                                                 />
                                                                 <span className=" text-[#273A38]">
-                                                                    {selectedMarker
+                                                                {selectedMarker
                                                                         .address
-                                                                        .city +
-                                                                        ',' +
+                                                                        .streetNumber +
+                                                                        ' ' +
                                                                         selectedMarker
                                                                             .address
-                                                                            .district +
-                                                                        ',' +
+                                                                            .streetName +
+                                                                        ' ' +
                                                                         selectedMarker
                                                                             .address
-                                                                            .majorIntersection}
+                                                                            .streetSuffix + ", " + selectedMarker.address.city}
                                                                 </span>
                                                             </div>
                                                             <div className=" flex justify-between text-sm items-center">
@@ -464,8 +567,7 @@ console.log("selectedMarker" , selectedMarker)
                                                                     </p>
                                                                 </div>
                                                                 <div className=" flex justify-between">
-                                                                    
-                                                                    <div className="flex text-xs">
+                                                                <div className="flex text-xs mx-2">
                                                                         <Bed
                                                                             size={
                                                                                 18
@@ -474,11 +576,14 @@ console.log("selectedMarker" , selectedMarker)
                                                                         />
                                                                         <span className=" mx-1 text-[#595653]">
                                                                             {
-                                                                                selectedMarker.numRooms
+                                                                                selectedMarker.details.numBedrooms
+                                                                            }
+                                                                            {
+                                                                                selectedMarker.details.numbBedroomsPlus && ` + ${selectedMarker.details.numbBedroomsPlus}`
                                                                             }
                                                                         </span>
                                                                     </div>
-                                                                    <div className="flex text-xs">
+                                                                    <div className="flex text-xs mx-2">
                                                                         <Bathtub
                                                                             size={
                                                                                 18
@@ -486,10 +591,13 @@ console.log("selectedMarker" , selectedMarker)
                                                                             className=" text-[#595653]"
                                                                         />
                                                                         <span className=" mx-1 text-[#595653]">
-                                                                            2
+                                                                        {
+                                                                                selectedMarker.details.numBathrooms
+                                                                            }
                                                                         </span>
                                                                     </div>
-                                                                    <div className="flex text-xs">
+                                                                    
+                                                                    <div className="flex text-xs mx-2">
                                                                         <Car
                                                                             size={
                                                                                 18
@@ -497,7 +605,7 @@ console.log("selectedMarker" , selectedMarker)
                                                                             className=" text-[#595653]"
                                                                         />
                                                                         <span className=" mx-1 text-[#595653]">
-                                                                            2
+                                                                            {Number(selectedMarker.details.numGarageSpaces)}
                                                                         </span>
                                                                     </div>
                                                                 </div>
@@ -544,7 +652,7 @@ console.log("selectedMarker" , selectedMarker)
                                     e.layer
                                         .getAllChildMarkers()
                                         .map((item: any) => {
-                                            const findListings = listings.listings.find((item2 : any) => Number(item2.map.latitude) === Number( item._latlng.lat) && Number(item2.map.longitude) === item._latlng.lng )
+                                            const findListings = listings.find((item2 : any) => Number(item2.map.latitude) === Number( item._latlng.lat) && Number(item2.map.longitude) === item._latlng.lng )
                                            if(findListings){
                                             newChildrens.push(findListings)
                                            }
@@ -571,10 +679,10 @@ console.log("selectedMarker" , selectedMarker)
                                     }}
                                     icon={divIcon({
                                         className: 'custom-icon',
-                                        html: `<div style="background-color: white; color:#4B8179;  text-align: center; padding: 5px;border-radius:10% / 25%;border : 2px solid #4B8179">$ ${ Math.floor(Number(listings?.listings.find((item:any) => 
+                                        html: `<div style="background-color: white; color:#4B8179;  text-align: center; padding: 3px;border-radius:10% / 25%;border : 2px solid #4B8179">$ ${ formatPrice(Math.floor(Number(listings?.find((item:any) => 
                                             Number(item.map.latitude) === address[0] && 
                                             Number(item.map.longitude) === address[1]
-                                            )?.originalPrice)).toLocaleString() || "N/A" }</div>`,
+                                            )?.originalPrice))) || "N/A" }</div>`,
                                         iconSize: [80, 35],
                                     })}
                                     >
@@ -615,7 +723,7 @@ console.log("selectedMarker" , selectedMarker)
                                                             />
                                                              <p className=" bg-[#E5F0A6] rounded-xl py-0.5 px-3 text-xs opacity-75 mr-1 text-[#7C951B] absolute top-0 left-1">
                                                                         {
-                                                                            `${selectedMarker.type} - ${selectedMarker.details.propertyType}`
+                                                                            `${selectedMarker.type}`
                                                                         }
                                                                         
                                                                     </p>
@@ -707,11 +815,13 @@ console.log("selectedMarker" , selectedMarker)
                                                                         </span>
                                                                     </div>
                                                                 </div>
+                                                                
                                                             </div>
-
-
-
-
+                                                            <div className=''>
+                                                            <hr className=' w-full text-[#EBEAE9]' />
+                                                                <span className=' bg-[#4B8179] py-1 px-2 rounded-full text-xs text-white mt-2 '>{selectedMarker.details.propertyType}</span>
+                                                            </div>
+                                                            
                                                             </div>
                                                             </div>
                                                             

@@ -44,11 +44,19 @@ export const DetailService = async (ctx: QueryFunctionContext) => {
     return data
 }
 
-export const listingsService = async () => {
-    const { data }: { data: any } = await request.get(
-        `https://api.repliers.io/listings`)
-    return data
-}
+export const listingsService = async (
+    pageParam: number, 
+    currentViewPolygon: any, 
+    searchMlsNumber : string,
+    signal?: AbortSignal,
+   
+  ) => {
+    const { data }: { data: any } = await request.post(
+        searchMlsNumber ? `https://api.repliers.io/listings?mlsNumber=${searchMlsNumber}` : `https://api.repliers.io/listings?pageNum=${pageParam}&map=${JSON.stringify(currentViewPolygon)}`,
+      { signal }  // Pass signal as part of the request options
+    );
+    return data;
+  };
 
 export const placesService = async () => {
     const { data }: { data: any } = await request.get(
@@ -58,7 +66,6 @@ export const placesService = async () => {
 
 
 export const filterListingPropertyTypeService = async (payload:IFilters) => {
-    console.log("payload" , payload)
         let params = ''
         if(payload.leaseAndSale){
             
@@ -99,7 +106,6 @@ export const filterListingPropertyTypeService = async (payload:IFilters) => {
         }
        
         if(payload.more.bedrooms){
-            console.log("fuck bed" , params.indexOf("?"))
             if(params.indexOf("?") < 0){
                 params = `?minBeds=${payload.more.bedrooms}`
             }else{

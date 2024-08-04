@@ -62,7 +62,6 @@ export default function AiChatFilters({
         }
     }, [AIData])
 
-    console.log('aiData', data)
 
     return (
         <>
@@ -93,7 +92,17 @@ export default function AiChatFilters({
                         <div className=" my-1 flex text-xs">
                             <MapPin size={18} className=" text-[#595653]" />
                             <span className=" text-[#273A38]">
-                                {item.address}
+                            {item
+                                                                        .address
+                                                                        .streetNumber +
+                                                                        ' ' +
+                                                                        item
+                                                                            .address
+                                                                            .streetName +
+                                                                        ' ' +
+                                                                        item
+                                                                            .address
+                                                                            .streetSuffix + ", " + item.address.city}
                             </span>
                         </div>
                         <div className=" flex justify-between text-sm items-center">
@@ -109,34 +118,48 @@ export default function AiChatFilters({
                                 </p> */}
                             </div>
                             <div className=" flex justify-between">
-                                <div className="flex text-xs">
-                                    <Bathtub
-                                        size={18}
-                                        className=" text-[#595653]"
-                                    />
-                                    <span className=" mx-1 text-[#595653]">
-                                        2
-                                    </span>
-                                </div>
-                                <div className="flex text-xs">
-                                    <Bed
-                                        size={18}
-                                        className=" text-[#595653]"
-                                    />
-                                    <span className=" mx-1 text-[#595653]">
-                                        {item.numRooms}
-                                    </span>
-                                </div>
-                                <div className="flex text-xs">
-                                    <Car
-                                        size={18}
-                                        className=" text-[#595653]"
-                                    />
-                                    <span className=" mx-1 text-[#595653]">
-                                        2
-                                    </span>
-                                </div>
-                            </div>
+                                                                <div className="flex text-xs mx-2">
+                                                                        <Bed
+                                                                            size={
+                                                                                18
+                                                                            }
+                                                                            className=" text-[#595653]"
+                                                                        />
+                                                                        <span className=" mx-1 text-[#595653]">
+                                                                            {
+                                                                                item.details.numBedrooms
+                                                                            }
+                                                                            {
+                                                                                item.details.numbBedroomsPlus && ` + ${item.details.numbBedroomsPlus}`
+                                                                            }
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="flex text-xs mx-2">
+                                                                        <Bathtub
+                                                                            size={
+                                                                                18
+                                                                            }
+                                                                            className=" text-[#595653]"
+                                                                        />
+                                                                        <span className=" mx-1 text-[#595653]">
+                                                                        {
+                                                                                item.details.numBathrooms
+                                                                            }
+                                                                        </span>
+                                                                    </div>
+                                                                    
+                                                                    <div className="flex text-xs mx-2">
+                                                                        <Car
+                                                                            size={
+                                                                                18
+                                                                            }
+                                                                            className=" text-[#595653]"
+                                                                        />
+                                                                        <span className=" mx-1 text-[#595653]">
+                                                                            {Number(item.details.numGarageSpaces)}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
                         </div>
                     </div>
                 ))}

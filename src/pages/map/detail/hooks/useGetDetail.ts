@@ -9,6 +9,5 @@ export default function useGetDetail() {
         ['get-detail-in-detail-page', mlsNumber, latitude, longitude],
         DetailService
     )
-    console.log("data"  , data)
     return { data }
 }

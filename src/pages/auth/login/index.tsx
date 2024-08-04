@@ -95,7 +95,7 @@ export default function Login() {
                             )}
                         </div>
                         <div className=" w-full flex justify-between my-4">
-                            <Checkbox onChange={() => console.log('salam')}>
+                            <Checkbox >
                                 Remember me
                             </Checkbox>
                             <p

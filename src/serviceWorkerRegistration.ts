@@ -93,10 +93,7 @@ export function register(config?: Config) {
                 // Add some additional logging to localhost, pointing developers to the
                 // service worker/PWA documentation.
                 navigator.serviceWorker.ready.then((registration) => {
-                    console.log(
-                        'This web app is being served cache-first by a service ' +
-                            'worker. To learn more, visit https://cra.link/PWA'
-                    )
+                   
                     // Use the PushManager to get the user's subscription to the push service.
                 })
             } else {
@@ -114,10 +111,8 @@ function registerValidSW(swUrl: string, config?: Config) {
             registration.pushManager
                 .getSubscription()
                 .then(async function (subscription) {
-                    console.log(subscription)
                     // If a subscription was found, return it.
                     // if (subscription) {
-                    //   console.log(subscription);
                     //   return subscription;
                     // }
                     // return registration.pushManager.subscribe({
@@ -143,8 +138,6 @@ function registerValidSW(swUrl: string, config?: Config) {
                     // send notifications that don't have a visible effect for the user).
                 })
             // .then(subscription => {
-            //   console.log('info workers');
-            //   console.log(subscription);
             //   try {
             //     const userProfile = window.localStorage.getItem('user');
             //     fetch(
@@ -163,7 +156,6 @@ function registerValidSW(swUrl: string, config?: Config) {
             //       },
             //     );
             //   } catch (error) {
-            //     console.log(error);
             //   }
             // });
 
@@ -186,8 +178,6 @@ function registerValidSW(swUrl: string, config?: Config) {
                             // At this point, the updated precached content has been fetched,
                             // but the previous service worker will still serve the older
                             // content until all client tabs are closed.
-                            // console.log('update find...');
-
                             //  ShowToastMessage({
                             //    type: 'Success',
                             //    text: 'در حال به روزرسانی...',
@@ -205,11 +195,9 @@ function registerValidSW(swUrl: string, config?: Config) {
                                 config.onUpdate(registration)
                             }
                         } else {
-                            // console.log('display');
                             // At this point, everything has been precached.
                             // It's the perfect time to display a
                             // "Content is cached for offline use." message.
-                            // console.log('Content is cached for offline use.');
 
                             // Execute callback
                             if (config && config.onSuccess) {
@@ -250,9 +238,7 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
             }
         })
         .catch(() => {
-            console.log(
-                'No internet connection found. App is running in offline mode.'
-            )
+          
         })
 }
 

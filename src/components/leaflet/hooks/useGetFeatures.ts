@@ -11,7 +11,6 @@ export default function useGetFeatures(
             return aiServiceFeatures(payload)
         },
         onSuccess: (data) => {
-            console.log("data" , data)
             if (data && data.data && data.data.output_from_query_ids) {
                 setAIData(data.data.output_from_query_ids)
                 const firstData = data.data.output_from_query_ids

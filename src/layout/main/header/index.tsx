@@ -11,6 +11,12 @@ import ActiveModal from 'components/modals/activeModal'
 import SoldModal from 'components/modals/soldModal'
 import DeListedModal from 'components/modals/deListedModal'
 import { CaretDown, MagnifyingGlass, MapTrifold } from '@phosphor-icons/react'
+import type { GetProps } from 'antd';
+import { useDispatch, useSelector } from 'react-redux'
+import { toggleMlsNumber } from 'store/constants'
+type SearchProps = GetProps<typeof Input.Search>;
+
+const { Search } = Input;
 
 export default function Header() {
     const [forSale, setForSale] = useState<string>('For Sale')
@@ -41,6 +47,10 @@ export default function Header() {
         setSelectedActive(0)
         setSelectedSold(0)
     }
+   
+    const dispatch = useDispatch()
+   
+    const onSearch: SearchProps['onSearch'] = (value, _e, info) => dispatch(toggleMlsNumber({mlsNumber : value}));
     return (
         <div className=" relative">
             <div className=" grid grid-cols-3 gap-4 py-1 items-center">
@@ -48,10 +58,12 @@ export default function Header() {
                     <h1 className=" text-white font-extrabold text-2xl mx-10">
                         Logo
                     </h1>
-                    <Input
+                    {/* <Input
                         placeholder="Search Address,Street Name or Listing"
                         prefix={<MagnifyingGlass size={15} />}
-                    />
+                        
+                    /> */}
+                    <Search placeholder="Search mlsNumber" onSearch={onSearch}  />
                 </div>
                 <div className="w-full col-span-2">
                     <div className=" flex items-center w-full  justify-center">
