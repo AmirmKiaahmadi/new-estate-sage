@@ -47,13 +47,14 @@ export const DetailService = async (ctx: QueryFunctionContext) => {
 export const listingsService = async (
     pageParam: number, 
     currentViewPolygon: any, 
-    searchMlsNumber : string,
+    searchMlsNumber: string,
     signal?: AbortSignal,
-   
   ) => {
     const { data }: { data: any } = await request.post(
-        searchMlsNumber ? `https://api.repliers.io/listings?mlsNumber=${searchMlsNumber}` : `https://api.repliers.io/listings?pageNum=${pageParam}&map=${JSON.stringify(currentViewPolygon)}`,
-      { signal }  // Pass signal as part of the request options
+      searchMlsNumber 
+        ? `https://api.repliers.io/listings?mlsNumber=${searchMlsNumber}` 
+        : `https://api.repliers.io/listings?pageNum=${pageParam}&map=${JSON.stringify(currentViewPolygon)}&cluster=true`,
+      { signal }
     );
     return data;
   };
@@ -181,3 +182,11 @@ export const filterListingPropertyTypeService = async (payload:IFilters) => {
     return data
 }
 
+
+export const clustersService = async (ctx: QueryFunctionContext) => {
+   
+    const { data }: { data: any } = await request.get(
+        `https://api.repliers.io/listings?cluster=true&clusterLimit=500&clusterPrecision=10`,
+    )
+    return data
+}

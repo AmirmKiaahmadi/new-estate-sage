@@ -61,6 +61,7 @@ import WatchedArea from './filters/whatchedArea'
 import { formatPrice } from 'utilities/helper/formatPrice'
 import { useSelector } from 'react-redux'
 import { RootState } from 'store'
+import useGetClusters from './hooks/useGetClusters'
 
 export interface IFilters {
     properties: string[]
@@ -141,13 +142,12 @@ const Map = () => {
             ]
         ]
     ]);
-    // const {places} = useGetPlaces()
     const [listingMarkers , setListingMarkers] = useState<any[]>([])
     const [listings , setListings] = useState<any>()
     const [isDraw , setIsDraw] = useState(false)
     const searchMlsNumber = useSelector((state : RootState)  => state.sideBarControler.mlsNumber)
-
-    const { isLoadingListings} = useGetListings(setListingMarkers , setListings , listings , currentViewPolygon , isDraw , searchMlsNumber , setAllMarkers)
+    const {clusters , refetchCluster} = useGetClusters(setListingMarkers)
+    const { isLoadingListings, lastData} = useGetListings(setListingMarkers , setListings , listings , currentViewPolygon , isDraw , searchMlsNumber , setAllMarkers , refetchCluster)
     const [selectedListings , setSelectedListings] = useState<any[]>([])
     const [isOpenSummeryModal , setIsOpenSummeryModal] = useState(false)
   
@@ -163,16 +163,10 @@ const Map = () => {
         setOpenChatAi,
         setRealData
     )
-    // const { mutateFeatures } = useGetFeatures(mutateDetail, setAIData)
     const {mutatePropertyType} = useSetListingPropertyType(setListingMarkers , setListings)
 
     const [filters, setFilters] = useState<IFilters>(initialFilters)
     const navigate = useNavigate()
-
-
-    // useEffect(() => {
-    //     mutatePropertyType(filters)
-    // }, [filters])
 
     const handleFindMarkerDetail = (value: any) => {
         const findMarkerDetail = listings?.find(
@@ -223,7 +217,7 @@ const Map = () => {
                             [ northeast.lng , southwest.lat],
                             [ northeast.lng , northeast.lat],
                             [ southwest.lng , northeast.lat],
-                        [ southwest.lng , southwest.lat], // Closing the polygon
+                        [ southwest.lng , southwest.lat], 
                     ],
                     ];
     
@@ -235,11 +229,8 @@ const Map = () => {
                     map.off('moveend', handleViewChange);
                 };
             }
-           
-
-            // Cleanup listener on component unmount
             
-        }, [map]); // Run effect when map instance changes
+        }, [map]);
 
         return null;
     };
@@ -250,19 +241,11 @@ const Map = () => {
         const newpol: any[] = coords[0].map((item: any) => [item.lng, item.lat]);
         //@ts-ignore
         setDrawnPolygons((prevDrawnPolygons) => {
-            // Combine the previous state with the new polygon
             const updatedPolygons = prevDrawnPolygons.length > 0 ? [...prevDrawnPolygons, newpol] : [newpol];
             setCurrentViewPolygon(updatedPolygons);
-            return updatedPolygons; // Return the updated state
+            return updatedPolygons;
         });
     };
-
-   
-
-
-
-console.log("selectedMarker" , selectedMarker)
-
     return (
         <>
         {isLoadingListings && 
@@ -411,8 +394,8 @@ console.log("selectedMarker" , selectedMarker)
                                 marker: false,
                                 circlemarker: false,
                             }}
-                            onCreated={handlePolygonCreated} // Handle the polygon creation
-                            onDrawStart={() => setIsDraw(true)} // Draw started
+                            onCreated={handlePolygonCreated}
+                            onDrawStart={() => setIsDraw(true)} 
                             onDeleted={() => {
                                
                                 setIsDraw(false)
@@ -442,230 +425,32 @@ console.log("selectedMarker" , selectedMarker)
                             )}
                         </div>
                     </Control>
-                    {listingMarkers.length > 0 && (
-                        <MarkerClusterGroup
-                        
-                            
-                            showCoverageOnHover={false}
-                            onClick={(e: any) => {
-                                
-                                if (e.layer.getAllChildMarkers().length > 1) {
-                                   setSelectedMarker(undefined)
-                                    const newChildrens  : any[] = []
-                                    e.layer
-                                        .getAllChildMarkers()
-                                        .map((item: any) => {
-                                            const findListings = listings?.find((item2 : any) => Number(item2.map.latitude) === Number( item._latlng.lat) && Number(item2.map.longitude) === item._latlng.lng )
-                                           if(findListings){
-                                            newChildrens.push(findListings)
-                                           }
-                                           
-                                        })  
-                                       
-                                  setOpenChatAi(undefined)
-                                  setIsOpenPropertyFilter(false)
-                                  setIsOpenPriceFilter(false)
-                                  setSelectedListings(newChildrens)
-                                }
-                            }}
-                        >
-                            {allMarkers &&
-                                allMarkers.map((address: any, index: any) => (
-                                    <Marker
-                                    key={index}
-                                    position={[address.map.latitude, address.map.longitude]}
-                                    eventHandlers={{
-                                        click: (e) => {
-                                            setSelectedListings([]);
-                                            handleFindMarkerDetail(e.latlng);
-                                        },
-                                    }}
-                                    icon={divIcon({
-                                        className: 'custom-icon',
-                                        html: `<div style="background-color: white; color:#4B8179;  text-align: center; padding: 1px;border-radius:10% / 25%;border : 2px solid #4B8179">$ ${ Math.floor(Number(listings?.find((item:any) => 
-                                            Number(item.map.latitude) === address[0] && 
-                                            Number(item.map.longitude) === address[1]
-                                            )?.originalPrice)).toLocaleString() || "N/A" }</div>`,
-                                        iconSize: [80, 35],
-                                    })}
-                                    >
-                                        {selectedMarker && (
-                                            <Popup>
-                                                <div
-                                                    style={popupContent}
-                                                    className=" cursor-pointer"
-                                                    onClick={() =>
-                                                        setOpenDetail(true)
-                                                    }
-                                                >
-                                                    <Card
-                                                        hoverable
-                                                        style={{
-                                                            width: 400,
-                                                        }}
-                                                        className=" relative"
-                                                        bodyStyle={{
-                                                            padding: '15px',
-                                                        }}
-                                                    >
-                                                        {/* <a
-                                                            target="_blank"
-                                                            href={`${window.location.pathname}/detail/${selectedMarker?.images[0]}/${selectedMarker.map.latitude}/${selectedMarker.map.longitude}`}
-                                                            className=" rounded-lg cursor-pointer"
-                                                           
-                                                        > */}
-                                                            <div className='grid grid-cols-3 gap-2' onClick = {() => setIsOpenSummeryModal(true)}>
-                                                            <img
-                                                                src={`https://cdn.repliers.io/${selectedMarker?.images[0]}?class=small`}
-                                                                alt="example"
-                                                                className=" col-span-1"
-                                                                style={{
-                                                                    height : "100%",
-                                                                    borderRadius : "10px"
-                                                                }}
-                                                            />
-                                                            <div className=' col-span-2'>
-
-                                                            <div className="flex justify-between text-sm items-center my-2">
-                                                              
-                                                                    <p className=" bg-[#E5F0A6] rounded-xl py-1 px-2 mr-1 text-[#7C951B]">
-                                                                        {
-                                                                            selectedMarker.type
-                                                                        }
-                                                                    </p>
-                                                                    <p className=" mx-1 text-[#7F7C77]">
-                                                                        {moment(new Date(selectedMarker.listDate)).format('YYYY-MM-DD')}
-                                                                    </p>
-                                                              
-                                                                
-                                                            </div>
-                                                            <div className=" my-1 flex text-xs">
-                                                                <MapPin
-                                                                    size={18}
-                                                                    className=" text-[#595653]"
-                                                                />
-                                                                <span className=" text-[#273A38]">
-                                                                {selectedMarker
-                                                                        .address
-                                                                        .streetNumber +
-                                                                        ' ' +
-                                                                        selectedMarker
-                                                                            .address
-                                                                            .streetName +
-                                                                        ' ' +
-                                                                        selectedMarker
-                                                                            .address
-                                                                            .streetSuffix + ", " + selectedMarker.address.city}
-                                                                </span>
-                                                            </div>
-                                                            <div className=" flex justify-between text-sm items-center">
-                                                                <div className="flex items-center">
-                                                                    <p className=" text-red-1">
-                                                                        $
-                                                                        {Number(
-                                                                            selectedMarker.originalPrice
-                                                                        ).toLocaleString()}
-                                                                    </p>
-                                                                </div>
-                                                                <div className=" flex justify-between">
-                                                                <div className="flex text-xs mx-2">
-                                                                        <Bed
-                                                                            size={
-                                                                                18
-                                                                            }
-                                                                            className=" text-[#595653]"
-                                                                        />
-                                                                        <span className=" mx-1 text-[#595653]">
-                                                                            {
-                                                                                selectedMarker.details.numBedrooms
-                                                                            }
-                                                                            {
-                                                                                selectedMarker.details.numbBedroomsPlus && ` + ${selectedMarker.details.numbBedroomsPlus}`
-                                                                            }
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="flex text-xs mx-2">
-                                                                        <Bathtub
-                                                                            size={
-                                                                                18
-                                                                            }
-                                                                            className=" text-[#595653]"
-                                                                        />
-                                                                        <span className=" mx-1 text-[#595653]">
-                                                                        {
-                                                                                selectedMarker.details.numBathrooms
-                                                                            }
-                                                                        </span>
-                                                                    </div>
-                                                                    
-                                                                    <div className="flex text-xs mx-2">
-                                                                        <Car
-                                                                            size={
-                                                                                18
-                                                                            }
-                                                                            className=" text-[#595653]"
-                                                                        />
-                                                                        <span className=" mx-1 text-[#595653]">
-                                                                            {Number(selectedMarker.details.numGarageSpaces)}
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-
-
-
-                                                            </div>
-                                                            </div>
-                                                            
-                                                           
-                                                        {/* </a> */}
-                                                    </Card>
-                                                </div>
-                                            </Popup>
-                                        )}
-                                       
-                                    </Marker>
-                                ))}
-                        </MarkerClusterGroup>
-                    )}
-
-
-
-
-
-
-
-
-
-
-
 {listingMarkers.length > 0 && (
                         <MarkerClusterGroup
                         
                             chunkedLoading
                             showCoverageOnHover={false}
-                            onClick={(e: any) => {
+                            // onClick={(e: any) => {
                                 
-                                if (e.layer.getAllChildMarkers().length > 1) {
-                                   setSelectedMarker(undefined)
-                                    const newChildrens  : any[] = []
-                                    e.layer
-                                        .getAllChildMarkers()
-                                        .map((item: any) => {
-                                            const findListings = listings.find((item2 : any) => Number(item2.map.latitude) === Number( item._latlng.lat) && Number(item2.map.longitude) === item._latlng.lng )
-                                           if(findListings){
-                                            newChildrens.push(findListings)
-                                           }
+                            //     if (e.layer.getAllChildMarkers().length > 1) {
+                            //        setSelectedMarker(undefined)
+                            //         const newChildrens  : any[] = []
+                            //         e.layer
+                            //             .getAllChildMarkers()
+                            //             .map((item: any) => {
+                            //                 const findListings = listings.find((item2 : any) => Number(item2.map.latitude) === Number( item._latlng.lat) && Number(item2.map.longitude) === item._latlng.lng )
+                            //                if(findListings){
+                            //                 newChildrens.push(findListings)
+                            //                }
                                            
-                                        })  
+                            //             })  
                                        
-                                  setOpenChatAi(undefined)
-                                  setIsOpenPropertyFilter(false)
-                                  setIsOpenPriceFilter(false)
-                                  setSelectedListings(newChildrens)
-                                }
-                            }}
+                            //       setOpenChatAi(undefined)
+                            //       setIsOpenPropertyFilter(false)
+                            //       setIsOpenPriceFilter(false)
+                            //       setSelectedListings(newChildrens)
+                            //     }
+                            // }}
                         >
                             {listingMarkers &&
                                 listingMarkers.map((address: any, index: any) => (
@@ -680,11 +465,12 @@ console.log("selectedMarker" , selectedMarker)
                                     }}
                                     icon={divIcon({
                                         className: 'custom-icon',
-                                        html: `<div style="background-color: white; color:#4B8179;  text-align: center; padding: 3px;border-radius:10% / 25%;border : 2px solid #4B8179">$ ${ formatPrice(Math.floor(Number(listings?.find((item:any) => 
+                                        html: address[2] === '571' ?  `<div style="background-color: white; color:#4B8179;  text-align: center; padding: 3px;border-radius:10% / 25%;border : 2px solid #4B8179">$ ${ formatPrice(Math.floor(Number(listings?.find((item:any) => 
                                             Number(item.map.latitude) === address[0] && 
                                             Number(item.map.longitude) === address[1]
-                                            )?.originalPrice))) || "N/A" }</div>`,
-                                        iconSize: [80, 35],
+                                            )?.originalPrice))) || "N/A" }</div>` 
+                                             : `<div style="background-color: rgba(110, 204, 57, 0.6);  text-align: center; padding: 8px 0;border-radius:100%;box-shadow: 0 4px 8px rgba(110, 204, 57, 0.6);">${address[2]}</div>`   ,
+                                        iconSize: address[2] === '571' ? [80 , 80] :  [40, 40],
                                     })}
                                     >
                                         {selectedMarker && (
