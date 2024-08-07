@@ -44,6 +44,14 @@ export const DetailService = async (ctx: QueryFunctionContext) => {
     return data
 }
 
+export const DetailModalService = async (ctx: QueryFunctionContext) => {
+    const { data }: { data: any } = await request.get(
+        `https://api.repliers.io/listings/${ctx.queryKey[1]}`,
+    )
+    return data
+   
+}
+
 export const listingsService = async (
     pageParam: number, 
     currentViewPolygon: any, 
@@ -53,7 +61,7 @@ export const listingsService = async (
     const { data }: { data: any } = await request.post(
       searchMlsNumber 
         ? `https://api.repliers.io/listings?mlsNumber=${searchMlsNumber}` 
-        : `https://api.repliers.io/listings?pageNum=${pageParam}&map=${JSON.stringify(currentViewPolygon)}&cluster=true`,
+        : `https://api.repliers.io/listings?pageNum=${pageParam}&map=${JSON.stringify(currentViewPolygon)}`,
       { signal }
     );
     return data;
@@ -186,7 +194,26 @@ export const filterListingPropertyTypeService = async (payload:IFilters) => {
 export const clustersService = async (ctx: QueryFunctionContext) => {
    
     const { data }: { data: any } = await request.get(
-        `https://api.repliers.io/listings?cluster=true&clusterLimit=500&clusterPrecision=10`,
+        `https://api.repliers.io/listings?cluster=true&clusterLimit=500&clusterPrecision=29&map=${JSON.stringify(ctx.queryKey[1])}&listings=false&clusterFields=mlsNumber,listPrice,address,images,details,type,listDate,originalPrice,location`,
     )
     return data
 }
+
+export const listingsServiceMutate = async (
+   payload : any 
+  ) => {
+    const { data }: { data: any } = await request.post(
+         `https://api.repliers.io/listings?lat=${payload.lat}&long=${payload.lng}&radius=0.01`,
+     
+    );
+    return data;
+  };
+
+
+
+  export const listingsSearchService = async (
+    searchMlsNumber: string,
+  ) => {
+    const { data }: { data: any } = await request.post(`https://api.repliers.io/listings?mlsNumber=${searchMlsNumber}`);
+    return data;
+  };

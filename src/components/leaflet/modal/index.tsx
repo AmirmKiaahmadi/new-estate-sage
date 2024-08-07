@@ -13,18 +13,22 @@ import moment from 'moment'
 import TextArea from 'antd/es/input/TextArea'
 import LocationMap from 'components/locationMap'
 import { useEffect, useState } from 'react'
+import useGetDetailModal from '../hooks/useGetDetails'
 interface IProps {
     open: boolean
     onHide: () => void
-    data : any
+    selectedMarker : any
 }
-export default function DetailModal({ open, onHide , data }: IProps) {
+export default function DetailModal({ open, onHide , selectedMarker }: IProps) {
+    const [mlsNumber , setMlsNumber] = useState<string>("")
     const [location, setLocation] = useState<any>()
     const [isSaved , setIsSaved] = useState<boolean>(false)
     const [savedLocations , setSavedLocations] = useState<any[] | undefined >(JSON.parse(localStorage.getItem('items')!))
    useEffect(() => {
-    if(savedLocations && savedLocations.length > 0 && data){
-        const find = savedLocations.find((item : any) => item.mlsNumber === data.mlsNumber)
+    if(savedLocations && savedLocations.length > 0 && selectedMarker){
+        setMlsNumber(selectedMarker.mlsNumber)
+
+        const find = savedLocations.find((item : any) => item.mlsNumber === selectedMarker.mlsNumber)
         if(find){
             setIsSaved(true)
         }else{
@@ -34,8 +38,10 @@ export default function DetailModal({ open, onHide , data }: IProps) {
         setIsSaved(false)
     }
     return () => setIsSaved(false)
-   } , [data , savedLocations])
-        
+   } , [selectedMarker , savedLocations])
+
+   const {modalData  ,isLoading} = useGetDetailModal(mlsNumber)
+    
     
     return (
         <Modal
@@ -48,10 +54,10 @@ export default function DetailModal({ open, onHide , data }: IProps) {
             width={1000}
         
         >
-            {data && (
+            {modalData && (
                 <>
                 <div className=' flex'>
-                <a target="_blank" href={`${window.location.pathname}/detail/${data?.mlsNumber}/${data.map.latitude}/${data.map.longitude}`} className=' hover:text-[#080606]'>
+                <a target="_blank" href={`${window.location.pathname}/detail/${modalData?.mlsNumber}/${modalData.map.latitude}/${modalData.map.longitude}`} className=' hover:text-[#080606]'>
                 <ArrowsOutSimple className=' border border-[#b3b3b3] rounded-md cursor-pointer mx-1' size={32} />
 
                 </a>
@@ -62,7 +68,7 @@ export default function DetailModal({ open, onHide , data }: IProps) {
                   
                     if(isSaved ){
                        
-                        const locations = savedLocations.filter(item => item.mlsNumber !== data.mlsNumber)
+                        const locations = savedLocations.filter(item => item.mlsNumber !== selectedMarker.mlsNumber)
                         localStorage.setItem("items" , JSON.stringify(locations))
                         // setIsSaved(true)
                         setSavedLocations(locations)
@@ -70,14 +76,14 @@ export default function DetailModal({ open, onHide , data }: IProps) {
                     }else{
                        
                         // setIsSaved(false)
-                        const locations = [...savedLocations , data]
+                        const locations = [...savedLocations , modalData]
                         localStorage.setItem("items" , JSON.stringify(locations))
                         setSavedLocations(locations)
                         setIsSaved(true)
                     }
                 }else{
                     
-                    const locations = [data]
+                    const locations = [modalData]
                     localStorage.setItem("items" , JSON.stringify(locations))
                     // setIsSaved(true)
                     setSavedLocations(locations)
@@ -93,7 +99,7 @@ export default function DetailModal({ open, onHide , data }: IProps) {
 
                     title: `stateSage Properties`,
                     text: "",
-                    url: `${window.location.pathname}/detail/${data?.mlsNumber}/${data.map.latitude}/${data.map.longitude}`,
+                    url: `${window.location.pathname}/detail/${modalData?.mlsNumber}/${modalData.map.latitude}/${modalData.map.longitude}`,
                   })
               }
                 
@@ -106,23 +112,23 @@ export default function DetailModal({ open, onHide , data }: IProps) {
 
 
            
-            {data ? 
+            {modalData ? 
             <div className=" flex flex-col mt-6">
             <div className=" grid grid-cols-8 gap-2 h-[300px] w-full overflow-x-hidden ">
                 <div className="col-span-4 h-[300px]">
                     <div className=" relative ">
                         <img
-                            src={`https://cdn.repliers.io/${data.images[0]}?class=large`}
+                            src={`https://cdn.repliers.io/${modalData.images[0]}?class=large`}
                             alt="house"
                             className=" rounded-lg w-full h-[300px] "
                         />
                         <span className=" bg-[#F4F9F8] absolute top-5 left-5 text-[#4B8179] px-2 py-1 rounded-xl border border-[#DCEBE7]">
-                            For {data.type}
+                            For {selectedMarker.type}
                         </span>
                     </div>
                 </div>
                 <div className=" col-span-2  h-[300px] flex flex-col overflow-x-hidden">
-                    {data.images.slice(1, 3).map((item : any) => (
+                    {modalData.images.slice(1, 3).map((item : any) => (
                         <img
                             src={`https://cdn.repliers.io/${item}?class=small`}
                             alt="house"
@@ -131,7 +137,7 @@ export default function DetailModal({ open, onHide , data }: IProps) {
                     ))}
                 </div>
                 <div className=" col-span-2  h-[300px] flex flex-col overflow-x-hidden">
-                    {data.images.slice(4, 5).map((item : any) => (
+                    {modalData.images.slice(4, 5).map((item : any) => (
                         <img
                             src={`https://cdn.repliers.io/${item}?class=small`}
                             alt="house"
@@ -139,7 +145,7 @@ export default function DetailModal({ open, onHide , data }: IProps) {
                         />
                     ))}
                      <PhotoProvider>
-                   {data.images.map((item: any , index : number) => (              
+                   {modalData.images.map((item: any , index : number) => (              
                         <PhotoView key={index}  src={`https://cdn.repliers.io/${item}?class=large`}>
                          
                           <img
@@ -160,20 +166,20 @@ export default function DetailModal({ open, onHide , data }: IProps) {
     <div className=" my-3 flex w-full items-center">
                             <MapPin size={22} />
                             <p className=" text-xl mx-2">
-                                {data.address.area} , {data.address.district} ,
-                                {data.address.state} ,{' '}
-                                {data.address.majorIntersection} ,{' '}
-                                {data.address.neighborhood}
+                                {modalData.address.area} , {modalData.address.district} ,
+                                {modalData.address.state} ,{' '}
+                                {modalData.address.majorIntersection} ,{' '}
+                                {modalData.address.neighborhood}
                             </p>
                         </div>
     <div className="my-3 flex w-full items-center">
                             <p className=" text-[#7F7C77] border-r border-[#DCEBE7] px-4">
                                 Status change:{' '}
-                                {moment(new Date(data.updatedOn)).fromNow()}
+                                {moment(new Date(modalData.updatedOn)).fromNow()}
                             </p>
                             <p className=" text-[#7F7C77] px-4">
                                 Updated on:{' '}
-                                {moment(new Date(data.updatedOn)).format(
+                                {moment(new Date(modalData.updatedOn)).format(
                                     'YYYY-MM-DD'
                                 )}
                             </p>
@@ -182,17 +188,17 @@ export default function DetailModal({ open, onHide , data }: IProps) {
                         <div className=" flex justify-between  mt-4 mx-4">
                             <div className=' flex items-center text-[#595653]'>
                                 <Bed className=" mx-2" size={50} />
-                                <p className=' text-2xl'>{data.details.numBedrooms ? data.details.numBedrooms : 0}</p>
+                                <p className=' text-2xl'>{modalData.details.numBedrooms ? modalData.details.numBedrooms : 0}</p>
                             </div>
 
                             <div className=' flex items-center items-center text-[#595653]'>
                                 <Car className=" mx-2" size={50} />
-                                <p className=' text-2xl'>{data.details.numGarageSpaces ? data.details.numGarageSpaces : 0 }</p>
+                                <p className=' text-2xl'>{modalData.details.numGarageSpaces ? modalData.details.numGarageSpaces : 0 }</p>
                             </div>
 
                             <div className=' flex items-center items-center text-[#595653]'>
                                 <Bathtub className=" mx-2" size={50} />
-                                <p className=' text-2xl'>{data.details.numBathrooms ? data.details.numBathrooms  : 0 }</p>
+                                <p className=' text-2xl'>{modalData.details.numBathrooms ? modalData.details.numBathrooms  : 0 }</p>
                             </div>
                         </div>
                         <div
@@ -202,7 +208,7 @@ export default function DetailModal({ open, onHide , data }: IProps) {
                         {' '}
                         Description
                         <p className=" my-4 bg-[#FAFCE9] w-full rounded-md text-[#595653] text-sm p-4">
-                            {data.details.description}
+                            {modalData.details.description}
                         </p>
                     </div>
 
@@ -216,14 +222,14 @@ export default function DetailModal({ open, onHide , data }: IProps) {
                                 </div>
                                 <div className=" border-r border-l border-[#DCEBE7] w-full text-center  py-3">
                                     {/* @ts-ignore */}$
-                                    {data.taxes.annualAmount}
+                                    {modalData.taxes.annualAmount}
                                 </div>
                                 <div className=" w-full text-center py-3 bg-[#FAFCE9]">
                                     Building Age
                                 </div>
                                 <div className=" border-r border-l border-[#DCEBE7] w-full text-center  py-3">
                                     {/* @ts-ignore */}
-                                    {data.taxes.assessmentYear}
+                                    {modalData.taxes.assessmentYear}
                                 </div>
                             </div>
                             <div className=" flex justify-between border-b border-[#DCEBE7] ">
@@ -231,7 +237,7 @@ export default function DetailModal({ open, onHide , data }: IProps) {
                                     Property Type
                                 </div>
                                 <div className=" border-r border-l border-[#DCEBE7] w-full text-center  py-3">
-                                    {data.details.propertyType}
+                                    {modalData.details.propertyType}
                                 </div>
                                 <div className=" w-full text-center py-3 bg-[#FAFCE9]">
                                     Type of Dwelling
@@ -259,7 +265,7 @@ export default function DetailModal({ open, onHide , data }: IProps) {
                                     Year Built
                                 </div>
                                 <div className=" border-r border-l border-[#DCEBE7] w-full text-center  py-3">
-                                    {data.details.yearBuilt}
+                                    {modalData.details.yearBuilt}
                                 </div>
                                 <div className=" w-full text-center py-3 bg-[#FAFCE9]">
                                     Direction
@@ -279,7 +285,7 @@ export default function DetailModal({ open, onHide , data }: IProps) {
                                     Foundation Type
                                 </div>
                                 <div className=" border-r border-l border-[#DCEBE7] w-full text-center  py-3">
-                                    {data.details.foundationType}
+                                    {modalData.details.foundationType}
                                 </div>
                             </div>
                             <div className=" flex justify-between border-b border-[#DCEBE7] ">
@@ -287,13 +293,13 @@ export default function DetailModal({ open, onHide , data }: IProps) {
                                     Basement
                                 </div>
                                 <div className=" border-r border-l border-[#DCEBE7] w-full text-center  py-3">
-                                    {data.details.basement1}
+                                    {modalData.details.basement1}
                                 </div>
                                 <div className=" w-full text-center py-3 bg-[#FAFCE9]">
                                     Exterior
                                 </div>
                                 <div className=" border-r border-l border-[#DCEBE7] w-full text-center  py-3">
-                                    {data.details.exteriorConstruction1}
+                                    {modalData.details.exteriorConstruction1}
                                 </div>
                             </div>
                             <div className=" flex justify-between border-b border-[#DCEBE7] ">
@@ -310,8 +316,8 @@ export default function DetailModal({ open, onHide , data }: IProps) {
 <div className=' mx-4 mt-4'>
 <LocationMap
                                 center={{
-                                    lat: Number(data.map.latitude),
-                                    lng: Number(data.map.longitude),
+                                    lat: Number(modalData.map.latitude),
+                                    lng: Number(modalData.map.longitude),
                                 }}
                                 selectLocation={setLocation}
                                 height='200px'
@@ -325,10 +331,10 @@ export default function DetailModal({ open, onHide , data }: IProps) {
     <div className="border border-[#DCEBE7] rounded-lg p-3 fixed">
                         <div className="flex justify-between">
                             <h2 className="text-primary text-xl">
-                                ${Number(data.listPrice).toLocaleString()}
+                                ${Number(modalData.listPrice).toLocaleString()}
                             </h2>
                             <span className="bg-[#F4F9F8] text-[#4B8179] px-2 py-1 rounded-xl border border-[#DCEBE7]">
-                                For {data.type}
+                                For {modalData.type}
                             </span>
                         </div>
                         <hr className="text-[#DCEBE7] my-2 w-full" />

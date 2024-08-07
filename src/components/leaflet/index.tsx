@@ -15,7 +15,7 @@ import LocationIcon from 'assets/images/map/location.png'
 import { popupContent, popupHead, popupText, okText } from './popUp/style'
 import House from 'assets/images/house/5c261_1.jpg'
 import { useNavigate } from 'react-router-dom'
-import { Card } from 'antd'
+import { Card, Spin } from 'antd'
 import { FaSquareParking } from 'react-icons/fa6'
 import { MdBathroom } from 'react-icons/md'
 import { MdBedroomParent } from 'react-icons/md'
@@ -62,6 +62,9 @@ import { formatPrice } from 'utilities/helper/formatPrice'
 import { useSelector } from 'react-redux'
 import { RootState } from 'store'
 import useGetClusters from './hooks/useGetClusters'
+import useGetSmallerListings from './hooks/useGetSmallerListings'
+import "./style.css"
+import useGetSearch from './hooks/useGetSearch'
 
 export interface IFilters {
     properties: string[]
@@ -146,10 +149,11 @@ const Map = () => {
     const [listings , setListings] = useState<any>()
     const [isDraw , setIsDraw] = useState(false)
     const searchMlsNumber = useSelector((state : RootState)  => state.sideBarControler.mlsNumber)
-    const {clusters , refetchCluster} = useGetClusters(setListingMarkers)
+    const {clusters , refetchCluster} = useGetClusters(setListingMarkers , currentViewPolygon , setListings)
     const { isLoadingListings, lastData} = useGetListings(setListingMarkers , setListings , listings , currentViewPolygon , isDraw , searchMlsNumber , setAllMarkers , refetchCluster)
     const [selectedListings , setSelectedListings] = useState<any[]>([])
     const [isOpenSummeryModal , setIsOpenSummeryModal] = useState(false)
+
   
 
 
@@ -246,11 +250,20 @@ const Map = () => {
             return updatedPolygons;
         });
     };
+    const { mutateSimilar , isLoadingSimilar } = useGetSmallerListings(setSelectedListings)
+    const {mutateSearch} = useGetSearch(setListingMarkers)
+    useEffect(() => {
+        if(searchMlsNumber){
+            mutateSearch(searchMlsNumber)
+        }else{
+            refetchCluster()
+        }
+    } , [searchMlsNumber])
     return (
         <>
         {isLoadingListings && 
         <LoadingBar color="#0095a2" progress={isLoadingListings ? 60 : 100}
-        height={3}
+        height={5}
          />
         }
             <div
@@ -430,47 +443,52 @@ const Map = () => {
                         
                             chunkedLoading
                             showCoverageOnHover={false}
-                            // onClick={(e: any) => {
+                            onClick={(e: any) => {
                                 
-                            //     if (e.layer.getAllChildMarkers().length > 1) {
-                            //        setSelectedMarker(undefined)
-                            //         const newChildrens  : any[] = []
-                            //         e.layer
-                            //             .getAllChildMarkers()
-                            //             .map((item: any) => {
-                            //                 const findListings = listings.find((item2 : any) => Number(item2.map.latitude) === Number( item._latlng.lat) && Number(item2.map.longitude) === item._latlng.lng )
-                            //                if(findListings){
-                            //                 newChildrens.push(findListings)
-                            //                }
+                                // if (e.layer.getAllChildMarkers().length > 1) {
+                                //    setSelectedMarker(undefined)
+                                //     const newChildrens  : any[] = []
+                                //     e.layer
+                                //         .getAllChildMarkers()
+                                //         .map((item: any) => {
+                                //             const findListings = listings.find((item2 : any) => Number(item2.map.latitude) === Number( item._latlng.lat) && Number(item2.map.longitude) === item._latlng.lng )
+                                //            if(findListings){
+                                //             newChildrens.push(findListings)
+                                //            }
                                            
-                            //             })  
+                                //         })  
                                        
-                            //       setOpenChatAi(undefined)
-                            //       setIsOpenPropertyFilter(false)
-                            //       setIsOpenPriceFilter(false)
-                            //       setSelectedListings(newChildrens)
-                            //     }
-                            // }}
+                                //   setOpenChatAi(undefined)
+                                //   setIsOpenPropertyFilter(false)
+                                //   setIsOpenPriceFilter(false)
+                                //   setSelectedListings(newChildrens)
+                                // }
+                            }}
                         >
                             {listingMarkers &&
-                                listingMarkers.map((address: any, index: any) => (
-                                    <Marker
+                                listingMarkers.map((address: any, index: any) => {
+                                        return (
+                                            <Marker
                                     key={index}
                                     position={[address[0], address[1]]}
                                     eventHandlers={{
                                         click: (e) => {
-                                            setSelectedListings([]);
-                                            handleFindMarkerDetail(e.latlng);
+                                          if(address[2] !== '571'){
+                                            setSelectedMarker(undefined)
+                                            mutateSimilar({lat : address[0] , lng : address[1]})
+                                          }else{
+                                              setSelectedMarker(listings)
+                                              setSelectedListings([]);
+                                            //   handleFindMarkerDetail(e.latlng);
+                                          }
                                         },
                                     }}
                                     icon={divIcon({
                                         className: 'custom-icon',
-                                        html: address[2] === '571' ?  `<div style="background-color: white; color:#4B8179;  text-align: center; padding: 3px;border-radius:10% / 25%;border : 2px solid #4B8179">$ ${ formatPrice(Math.floor(Number(listings?.find((item:any) => 
-                                            Number(item.map.latitude) === address[0] && 
-                                            Number(item.map.longitude) === address[1]
-                                            )?.originalPrice))) || "N/A" }</div>` 
-                                             : `<div style="background-color: rgba(110, 204, 57, 0.6);  text-align: center; padding: 8px 0;border-radius:100%;box-shadow: 0 4px 8px rgba(110, 204, 57, 0.6);">${address[2]}</div>`   ,
-                                        iconSize: address[2] === '571' ? [80 , 80] :  [40, 40],
+                                       html: address[2] === '571'
+      ? `<div style="background-color: white; color:#4B8179; text-align: center; padding: 3px; border-radius:10% / 25%; border: 2px solid #4B8179;">${formatPrice(listings.listPrice) || "N/A"}</div>`
+      : `<div style="background-color: white; text-align: center; padding: 10px 0; border : 2px solid #4B8179; color:#4B8179 ;border-radius:100%; box-shadow: 0 4px 8px rgba(51, 67, 42, 0.6);display:flex; justify-content: center;align-items:center">${isLoadingSimilar ? '<div class="custom-spinner"></div>' : address[2]}</div>`,
+    iconSize: address[2] === '571' ? [80, 80] : [40, 40],
                                     })}
                                     >
                                         {selectedMarker && (
@@ -492,12 +510,6 @@ const Map = () => {
                                                             padding: '15px',
                                                         }}
                                                     >
-                                                        {/* <a
-                                                            target="_blank"
-                                                            href={`${window.location.pathname}/detail/${selectedMarker?.images[0]}/${selectedMarker.map.latitude}/${selectedMarker.map.longitude}`}
-                                                            className=" rounded-lg cursor-pointer"
-                                                           
-                                                        > */}
                                                             <div className='grid grid-cols-3 gap-2 relative' onClick = {() => setIsOpenSummeryModal(true)}>
                                                             <img
                                                                 src={`https://cdn.repliers.io/${selectedMarker?.images[0]}?class=small`}
@@ -613,14 +625,16 @@ const Map = () => {
                                                             </div>
                                                             
                                                            
-                                                        {/* </a> */}
+                                                    
                                                     </Card>
                                                 </div>
                                             </Popup>
                                         )}
                                        
                                     </Marker>
-                                ))}
+                                        )
+                                    
+                                })}
                         </MarkerClusterGroup>
                     )}
 
@@ -634,12 +648,16 @@ const Map = () => {
                     
                 </MapContainer>
             </div>
-            <DetailModal
+            {
+                selectedMarker && 
+                <DetailModal
                 open={isOpenSummeryModal && selectedMarker}
                 onHide={() => setIsOpenSummeryModal(false)}
-                data = {selectedMarker}
+                selectedMarker = {selectedMarker}
                 
             />
+            }
+           
         </>
     )
 }

@@ -30,20 +30,10 @@ export default function useGetListings(
       retry: false,
     }
   );
-  const prevMarkersRef = useRef([]);
 
   useEffect(() => {
     if(data){
       if(data.pages[data.pages.length -1].numPages > 11){
-        refetchCluster()
-      }else{
-        const newMarkers = data.pages.reduce((acc, page) => acc.concat(page.listings), []);
-        //@ts-ignore
-        setAllMarkers((prevMarkers) => {
-            const existingMLSNumbers = prevMarkers.map(marker => marker.mlsNumber);
-            return [...prevMarkers, ...newMarkers.filter((item : any) => !existingMLSNumbers.includes(item.mlsNumber))];
-        });
-  
         if(!!searchMlsNumber){
           const allListings = data?.pages.reduce((acc, page) => {
             return acc.concat(page.listings);
@@ -59,43 +49,48 @@ export default function useGetListings(
           
           setListingMarkers(myArray);
         }else{
-        const lastData = data.pages[data.pages.length -1]
-        if(lastData.numPages < 11){
-          fetchNextPage()
-          const allListings = data?.pages.reduce((acc, page) => {
-            return acc.concat(page.listings);
-          }, []) || [];
-          
-  
-          if(listings){
-            const newListings : any[] = [...listings]
-            allListings.map((item : any) => {
-              const find = listings.find(list => list.mlsNumber === item.mlsNumber)
-              
-              if(!find){
-                newListings.push(item)
-              }
-            })
-            setListings(newListings)
-            const myArray: any[] = newListings.map((item: any) => [
-              Number(item?.map?.latitude), 
-              Number(item?.map?.longitude), 
-              '571'
-            ]);
-            
-            setListingMarkers(myArray);
-          }else{
-            setListings(allListings)
-            const myArray: any[] = allListings.map((item: any) => [
-              Number(item?.map?.latitude), 
-              Number(item?.map?.longitude), 
-              '571'
-            ]);
-            
-            setListingMarkers(myArray);
-          }
+          refetchCluster()
         }
-        } 
+       
+      }else{
+        // const newMarkers = data.pages.reduce((acc, page) => acc.concat(page.listings), []);
+        // //@ts-ignore
+        // setAllMarkers((prevMarkers) => {
+        //     const existingMLSNumbers = prevMarkers.map(marker => marker.mlsNumber);
+        //     return [...prevMarkers, ...newMarkers.filter((item : any) => !existingMLSNumbers.includes(item.mlsNumber))];
+        // });
+  
+        // if(!!searchMlsNumber){
+        //   const allListings = data?.pages.reduce((acc, page) => {
+        //     return acc.concat(page.listings);
+        //   }, []) || [];
+          
+        //   setListings(allListings);
+          
+        //   const myArray: any[] = allListings.map((item: any) => [
+        //     Number(item?.map?.latitude), 
+        //     Number(item?.map?.longitude), 
+        //     '571'
+        //   ]);
+          
+        //   setListingMarkers(myArray);
+        // }else{
+        // const lastData = data.pages[data.pages.length -1]
+        // // if(lastData.numPages < 11){
+        //   fetchNextPage()
+        //   const allListings = data?.pages.reduce((acc, page) => {
+        //     return acc.concat(page.listings);
+        //   }, []) || [];
+        //     setListings(allListings)
+        //     const myArray: any[] = allListings.map((item: any) => [
+        //       Number(item?.map?.latitude), 
+        //       Number(item?.map?.longitude), 
+        //       '571'
+        //     ]);
+            
+        //     setListingMarkers(myArray);
+         
+        // } 
       }
 
      
