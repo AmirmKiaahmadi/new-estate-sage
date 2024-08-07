@@ -8,6 +8,8 @@ import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons'
 import GoogleIcon from 'assets/images/login/Fill.svg'
 import * as Yup from 'yup'
 import style from 'layout/auth/auth.module.scss'
+import IconEstate from "assets/images/estate-logo/green.svg"
+
 export const Schema = Yup.object().shape({
     email: Yup.string().email().required('email is required'),
 })
@@ -27,9 +29,7 @@ export default function ForgotPassword() {
                 <Form className=" flex justify-start ml-28 items-center m-auto w-screen  ">
                     <div className="bg-white  p-6 rounded-2xl shadow-[rgba(13,_38,_76,_0.19)_0px_9px_20px] pb-40">
                         <div className=" flex w-full items-center">
-                            <div className=" bg-[#F7F7F7] p-8 rounded-md mr-6">
-                                <p className=" font-bold">Logo</p>
-                            </div>
+                        <img src={IconEstate} alt = "logo" className=' mr-8' />
                             <div>
                                 <h3 className=" text-primary text-2xl font-bold">
                                     Forgot your password?

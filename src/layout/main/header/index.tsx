@@ -14,6 +14,7 @@ import { CaretDown, MagnifyingGlass, MapTrifold } from '@phosphor-icons/react'
 import type { GetProps } from 'antd';
 import { useDispatch, useSelector } from 'react-redux'
 import { toggleMlsNumber } from 'store/constants'
+import IconEstate from "assets/images/estate-logo/white.svg"
 type SearchProps = GetProps<typeof Input.Search>;
 
 const { Search } = Input;
@@ -55,9 +56,8 @@ export default function Header() {
         <div className=" relative">
             <div className=" grid grid-cols-3 gap-4 py-1 items-center">
                 <div className=" col-span-1 flex items-center mx-2 w-full">
-                    <h1 className=" text-white font-extrabold text-2xl mx-10">
-                        Logo
-                    </h1>
+                    <img src = {IconEstate} alt='logo' className=' ml-6' />
+                    <p className=' text-white mx-2'>EstateSage</p>
                     {/* <Input
                         placeholder="Search Address,Street Name or Listing"
                         prefix={<MagnifyingGlass size={15} />}
