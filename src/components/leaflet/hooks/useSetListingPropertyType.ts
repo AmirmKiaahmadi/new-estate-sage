@@ -9,10 +9,18 @@ export default function useSetListingPropertyType(setListingMarkers: React.Dispa
             return filterListingPropertyTypeService(payload)
         },
         onSuccess: (data) => {
-            setListings(data)
-            const myArray : any[] = []
-            data.listings.map((item : any )=> myArray.push([Number(item?.map?.latitude) , Number(item.map.longitude) , "571"]) )
-            setListingMarkers(myArray)
+            
+            const markers : any[] = []
+            data.aggregates.map.clusters.map((item: any) => {
+              if(item.count === 1){
+                markers.push([item.location.latitude ,item.location.longitude , '571'])
+                setListings(item.listing)
+
+              }else{
+                markers.push([item.location.latitude ,item.location.longitude , item.count])
+              }
+            } )
+            setListingMarkers(markers)  
         },
         onError: () => {},
     })

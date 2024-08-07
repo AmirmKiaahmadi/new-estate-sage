@@ -41,6 +41,8 @@ export default function DetailModal({ open, onHide , selectedMarker }: IProps) {
    } , [selectedMarker , savedLocations])
 
    const {modalData  ,isLoading} = useGetDetailModal(mlsNumber)
+   console.log("modalData" , modalData)
+   console.log("selectyeddddddddd" , selectedMarker)
     
     
     return (

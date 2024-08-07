@@ -45,10 +45,13 @@ export const DetailService = async (ctx: QueryFunctionContext) => {
 }
 
 export const DetailModalService = async (ctx: QueryFunctionContext) => {
-    const { data }: { data: any } = await request.get(
-        `https://api.repliers.io/listings/${ctx.queryKey[1]}`,
-    )
-    return data
+    if(ctx.queryKey[1]){
+        const { data }: { data: any } = await request.get(
+            `https://api.repliers.io/listings/${ctx.queryKey[1]}`,
+        )
+        return data
+    }
+  
    
 }
 
@@ -86,7 +89,7 @@ export const filterListingPropertyTypeService = async (payload:IFilters) => {
             }
         }
        
-        if(payload.properties.length < 0){
+        if(payload.properties.length > 0){
             payload.properties.map((item , index) => {
                 if(index === 0 && params.indexOf("?") < 0){
                     params = `?propertyType=${item}`
@@ -184,7 +187,7 @@ export const filterListingPropertyTypeService = async (payload:IFilters) => {
        
         
     const { data }: { data: any } = await request.post(
-        `https://api.repliers.io/listings${params}`
+        `https://api.repliers.io/listings?cluster=true&clusterLimit=500&clusterPrecision=29&listings=false&clusterFields=mlsNumber,listPrice,address,images,details,type,listDate,originalPrice,location${params}`
         
     )
     return data

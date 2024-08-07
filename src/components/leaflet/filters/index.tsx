@@ -30,6 +30,7 @@ interface IFiltersProps {
     search: string
     setSelectedListings: React.Dispatch<React.SetStateAction<any[]>>
     setIsOpenWhatchedArea : React.Dispatch<React.SetStateAction<boolean>>
+    
 }
 export default function Filters({
     setOpenChatAi,
@@ -248,7 +249,10 @@ export default function Filters({
                             <DotsThreeOutline size={20} />
                             <span className=" text-sm mx-2">More Detail</span>
                         </div>
-                        <div className=" flex text-[#595653] cursor-pointer my-4" onClick={() => setIsOpenWhatchedArea(true)}>
+                        <div className=" flex text-[#595653] cursor-pointer my-4" onClick={() => {
+                            setIsOpenWhatchedArea(true)
+                            setSelectedListings([])
+                        }}>
                             <MapPinArea size={20} />
                             <span className=" text-sm mx-2">Watched Area</span>
                         </div>

@@ -32,8 +32,7 @@ export default function WatchedArea({setIsOpenSummeryModal , setSelectedMarker }
                 </p>
             </div>
             <div className=" flex text-[#595653]">
-                <ShareNetwork size={20} className=" mx-1" />
-                <BookmarkSimple size={20} className=" mx-1" />
+                <p className='text-[#7F7C77]'>{item.mlsNumber}</p>
             </div>
         </div>
         <div className=" my-1 flex text-xs">

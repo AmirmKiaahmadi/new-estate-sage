@@ -14,6 +14,7 @@ import OpenHouse from './openHouse'
 import ListingType from './listingType'
 import SquareFootage from './squareFootage'
 import { initialFilters } from 'utilities/helper/const'
+import { UseMutateFunction } from 'react-query'
 
 const text = `
   A dog is a type of domesticated animal.
@@ -25,12 +26,14 @@ interface Props {
     setFilters: React.Dispatch<React.SetStateAction<IFilters>>
     filters: IFilters
     setIsOpenActiveFilter: any
+    mutatePropertyType: UseMutateFunction<any, unknown, IFilters, unknown>
 }
 
 export default function MoreFilters({
     setFilters,
     filters,
     setIsOpenActiveFilter,
+    mutatePropertyType
 }: Props) {
     const items: CollapseProps['items'] = [
         {
@@ -107,6 +110,7 @@ export default function MoreFilters({
                         className=" w-full text-white rounded-md bg-[#9EBB27] py-2 mx-1"
                         onClick={() => {
                             setIsOpenActiveFilter(false)
+                            mutatePropertyType(filters)
                         }}
                     >
                         Apply

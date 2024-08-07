@@ -292,6 +292,7 @@ const Map = () => {
                             search={search}
                             setSelectedListings = {setSelectedListings}
                             setIsOpenWhatchedArea = {setIsOpenWhatchedArea}
+                           
                         />
                     </div>
                 )}
@@ -310,6 +311,7 @@ const Map = () => {
                             setFilters={setFilters}
                             filters={filters}
                             setIsOpenPropertyFilter={setIsOpenPropertyFilter}
+                            mutatePropertyType = {mutatePropertyType}
                             
                         />
                     </div>
@@ -320,6 +322,7 @@ const Map = () => {
                             setFilters={setFilters}
                             filters={filters}
                             setIsOpenPriceFilter={setIsOpenPriceFilter}
+                            mutatePropertyType = {mutatePropertyType}
                         />
                     </div>
                 )}
@@ -339,6 +342,7 @@ const Map = () => {
                             setFilters={setFilters}
                             filters={filters}
                             setIsOpenActiveFilter={setIsOpenMoreFilters}
+                            mutatePropertyType = {mutatePropertyType}
                         />
                         </div>
                        
@@ -474,6 +478,7 @@ const Map = () => {
                                     eventHandlers={{
                                         click: (e) => {
                                           if(address[2] !== '571'){
+                                            setSelectedListings([]);
                                             setSelectedMarker(undefined)
                                             mutateSimilar({lat : address[0] , lng : address[1]})
                                           }else{

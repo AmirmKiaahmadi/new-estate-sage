@@ -8,7 +8,7 @@ interface Props {
     setFilters: React.Dispatch<React.SetStateAction<IFilters>>
     filters: IFilters
     setIsOpenPropertyFilter: React.Dispatch<React.SetStateAction<boolean>>
-   
+    mutatePropertyType: UseMutateFunction<any, unknown, IFilters, unknown>
 }
 
 const CheckboxGroup = Checkbox.Group
@@ -24,6 +24,7 @@ export default function PropertyAiFilters({
     setFilters,
     filters,
     setIsOpenPropertyFilter,
+    mutatePropertyType
     
 }: Props) {
     const [properties , setProperties] = useState<string[]>([])
@@ -71,7 +72,7 @@ export default function PropertyAiFilters({
                     className=" w-full mx-2 bg-primary text-white py-2 rounded-lg"
                     onClick={() => {
                         setIsOpenPropertyFilter(false)
-                        
+                        mutatePropertyType(filters)
                     }}
                 >
                     Apply

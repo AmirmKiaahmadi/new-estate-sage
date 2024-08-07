@@ -1,11 +1,13 @@
 import { InputNumber, Slider, Switch } from 'antd'
 import type { SliderSingleProps } from 'antd'
 import { IFilters } from 'components/leaflet'
+import { UseMutateFunction } from 'react-query'
 
 interface Props {
     setFilters: React.Dispatch<React.SetStateAction<IFilters>>
     filters: IFilters
     setIsOpenPriceFilter: React.Dispatch<React.SetStateAction<boolean>>
+    mutatePropertyType: UseMutateFunction<any, unknown, IFilters, unknown>
 }
 
 const formatter: NonNullable<SliderSingleProps['tooltip']>['formatter'] = (
@@ -20,6 +22,7 @@ export default function PriceFilter({
     setFilters,
     filters,
     setIsOpenPriceFilter,
+    mutatePropertyType
 }: Props) {
     return (
         <div className=" h-full flex flex-col">
@@ -67,6 +70,7 @@ export default function PriceFilter({
                     className=" w-full mx-2 bg-primary text-white py-2 rounded-lg"
                     onClick={() => {
                         setIsOpenPriceFilter(false)
+                        mutatePropertyType(filters)
                     }}
                 >
                     Apply
